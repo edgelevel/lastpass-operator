@@ -1,0 +1,2 @@
+https://github.com/entretechno/lastpass-api
+https://github.com/konomae/lastpass-python
