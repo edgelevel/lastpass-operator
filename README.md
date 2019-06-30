@@ -22,4 +22,8 @@ docker run --rm --name lastpass-cli  niqdev/lastpass-cli
 
 # access container
 docker exec -it lastpass-cli bash
+lpass --version
+
+# execute command inline
+docker run --rm -it niqdev/lastpass-cli lpass --version
 ```
