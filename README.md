@@ -43,7 +43,7 @@ sudo snap install --classic go
 brew install go
 ```
 
-Setup a [workspace](https://golang.org/doc/code.html#Workspaces)
+Setup [workspace](https://golang.org/doc/code.html#Workspaces)
 
 ```bash
 # >>> TODO verify
@@ -54,4 +54,17 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # clone sources
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
+```
+
+Development
+
+```bash
+# compile
+go build $GOPATH/src/github.com/niqdev/lastpass-operator
+
+# compile and build executable
+go install $GOPATH/src/github.com/niqdev/lastpass-operator
+
+# test
+go test $GOPATH/src/github.com/niqdev/lastpass-operator
 ```
