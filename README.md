@@ -52,6 +52,6 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # clone sources
-mkdir -p $GOPATH/src/github.com/niqdev/lastpass-operator && cd $_
+mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
 ```
