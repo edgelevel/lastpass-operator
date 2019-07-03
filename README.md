@@ -54,13 +54,26 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # clone sources
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
-
-# first time only
-dep init
 ```
 
 Development
 ```bash
+# first time only
+dep init
+
+# add dependencies
+dep ensure -add github.com/USER/DEP1 github.com/USER/DEP2
+# example
+dep ensure -add github.com/spf13/cobra
+
+# verify and update all dependencies
+dep status
+dep check
+dep ensure -update
+
+# resolve dependencies
+dep ensure
+
 # compile
 go build $GOPATH/src/github.com/niqdev/lastpass-operator
 
