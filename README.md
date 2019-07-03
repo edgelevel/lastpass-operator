@@ -30,34 +30,36 @@ docker run --rm -it niqdev/lastpass-cli lpass --version
 
 ## Setup
 
-Resources
+Documentation
 * [go](https://golang.org/doc)
 * [dep](https://golang.github.io/dep/docs/introduction.html)
 
-Install
+Install `go` and `dep`
 ```bash
 # ubuntu
 sudo snap install --classic go
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 # macos
 brew install go
+brew install dep
 ```
 
-Setup [workspace](https://golang.org/doc/code.html#Workspaces)
-
+Setup a [workspace](https://golang.org/doc/code.html#Workspaces)
 ```bash
-# >>> TODO verify
-# set the GOPATH environment variable
+# add to .bashrc or .bash_profile
 export GOPATH=$HOME/go
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # clone sources
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
+
+# first time only
+dep init
 ```
 
 Development
-
 ```bash
 # compile
 go build $GOPATH/src/github.com/niqdev/lastpass-operator
