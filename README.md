@@ -39,10 +39,15 @@ Install `go` and `dep`
 # ubuntu
 sudo snap install --classic go
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+# TODO operator-sdk
 
 # macos
 brew install go
 brew install dep
+brew install operator-sdk
+
+# cli
+go get github.com/spf13/cobra/cobra
 ```
 
 Setup a [workspace](https://golang.org/doc/code.html#Workspaces)
@@ -54,9 +59,6 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # clone sources
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
-
-# cli
-go get github.com/spf13/cobra/cobra
 ```
 
 Development
@@ -79,6 +81,9 @@ dep ensure
 
 # init cli
 cobra init . --pkg-name lastpass-operator
+
+# run
+go run main.go
 
 # compile
 go build $GOPATH/src/github.com/niqdev/lastpass-operator
