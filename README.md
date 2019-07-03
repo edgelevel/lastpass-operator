@@ -54,6 +54,9 @@ export PATH=$PATH:$(go env GOPATH)/bin
 # clone sources
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
+
+# cli
+go get github.com/spf13/cobra/cobra
 ```
 
 Development
@@ -73,6 +76,9 @@ dep ensure -update
 
 # resolve dependencies
 dep ensure
+
+# init cli
+cobra init . --pkg-name lastpass-operator
 
 # compile
 go build $GOPATH/src/github.com/niqdev/lastpass-operator
