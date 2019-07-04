@@ -96,3 +96,33 @@ $ lpass show example/secure-note-json
 example/secure-note-json [id: 5432661329597563641]
 URL: http://sn
 Notes: {"myKey":"myValue"}
+
+---
+
+$ lpass show example/example-pwd --json --expand-multi
+[
+  {
+    "id": "8281904599677253490",
+    "name": "example-pwd",
+    "fullname": "example/example-pwd",
+    "username": "my-username",
+    "password": "my-password",
+    "last_modified_gmt": "1561684727",
+    "last_touch": "1562237088",
+    "group": "example",
+    "url": "http://",
+    "note": ""
+  },
+  {
+    "id": "363075885435852539",
+    "name": "example-pwd",
+    "fullname": "example/example-pwd",
+    "username": "",
+    "password": "",
+    "last_modified_gmt": "1562264157",
+    "last_touch": "0",
+    "group": "example",
+    "url": "http://",
+    "note": ""
+  }
+]

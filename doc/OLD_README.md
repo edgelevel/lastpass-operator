@@ -97,7 +97,8 @@ go test $GOPATH/src/github.com/niqdev/lastpass-operator
 
 cd $GOPATH/src/github.com/niqdev/
 operator-sdk new lastpass-operator --dep-manager=dep
-
-operator-sdk add api --api-version=cache.example.com/v1alpha1 --kind=Memcached
+# add crd
+operator-sdk add api --api-version=niqdev.com/v1alpha1 --kind=LastPassSecret
 operator-sdk generate k8s
-operator-sdk add controller --api-version=cache.example.com/v1alpha1 --kind=Memcached
+# add controller
+operator-sdk add controller --api-version=niqdev.com/v1alpha1 --kind=LastPassSecret
