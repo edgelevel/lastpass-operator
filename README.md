@@ -2,6 +2,9 @@
 
 > TODO
 
+* [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret)
+* [OperatorHub](https://operatorhub.io)
+
 ## Development
 
 ### LastPass
@@ -29,7 +32,7 @@ Docker
 docker build -t niqdev/lastpass-cli .
 
 # temporary container
-docker run --rm --name lastpass-cli  niqdev/lastpass-cli
+docker run --rm --name lastpass-cli niqdev/lastpass-cli
 
 # access container
 docker exec -it lastpass-cli bash
@@ -94,7 +97,7 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
-Init project
+Initialize project
 ```bash
 # create project
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_

@@ -1,2 +1,5 @@
 https://github.com/entretechno/lastpass-api
 https://github.com/konomae/lastpass-python
+
+https://github.com/acamillo/aws-secret-operator
+https://github.com/mumoshu/aws-secret-operator

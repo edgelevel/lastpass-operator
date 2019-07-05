@@ -76,7 +76,7 @@ Notes: abc123
 
 ---
 
-$ lpass show --all example/secure-note-json --json
+$ lpass show example/secure-note-json --json
 [
   {
     "id": "5432661329597563641",
