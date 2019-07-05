@@ -13,6 +13,16 @@ type LastPassSecretSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
+	ItemRef ItemRef `json:"itemRef,required"`
+}
+
+type ItemRef struct {
+	Group        string `json:"group,omitempty"`
+	Name         string `json:"name,required"`
+	WithUsername bool   `json:"withUsername,omitempty"`
+	WithPassword bool   `json:"withPassword,omitempty"`
+	WithUrl      bool   `json:"withUrl,omitempty"`
+	WithNote     bool   `json:"withNote,omitempty"`
 }
 
 // LastPassSecretStatus defines the observed state of LastPassSecret

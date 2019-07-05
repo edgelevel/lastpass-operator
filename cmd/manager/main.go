@@ -68,6 +68,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.Info("Running in namespace: %s", namespace)
+
 	// Get a config to talk to the apiserver
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -86,7 +88,8 @@ func main() {
 
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
-		Namespace:          namespace,
+		// watch all namespaces
+		Namespace:          "",
 		MapperProvider:     restmapper.NewDynamicRESTMapper,
 		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	})

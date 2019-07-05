@@ -2,6 +2,8 @@
 
 > TODO
 
+* [Extend the Kubernetes API with CustomResourceDefinitions](https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions)
+* [Groups and Versions and Kinds, oh my!](https://book.kubebuilder.io/cronjob-tutorial/gvks.html)
 * [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret)
 * [OperatorHub](https://operatorhub.io)
 
