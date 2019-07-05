@@ -1,5 +1,9 @@
 https://github.com/entretechno/lastpass-api
 https://github.com/konomae/lastpass-python
 
-https://github.com/acamillo/aws-secret-operator
+https://godaddy.github.io/2019/04/16/kubernetes-external-secrets
 https://github.com/mumoshu/aws-secret-operator
+https://github.com/acamillo/aws-secret-operator
+https://github.com/cmattoon/aws-ssm
+https://github.com/shyiko/kubesec
+https://github.com/Boostport/kubernetes-vault
