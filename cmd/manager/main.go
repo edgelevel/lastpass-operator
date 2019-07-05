@@ -71,7 +71,7 @@ func main() {
 	// Get a config to talk to the apiserver
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Error(err, "")
+		log.Error(err, "Failed to get config")
 		os.Exit(1)
 	}
 
@@ -91,7 +91,7 @@ func main() {
 		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	})
 	if err != nil {
-		log.Error(err, "")
+		log.Error(err, "Failed to create manager")
 		os.Exit(1)
 	}
 
@@ -99,13 +99,13 @@ func main() {
 
 	// Setup Scheme for all resources
 	if err := apis.AddToScheme(mgr.GetScheme()); err != nil {
-		log.Error(err, "")
+		log.Error(err, "Failed to setup scheme")
 		os.Exit(1)
 	}
 
 	// Setup all Controllers
 	if err := controller.AddToManager(mgr); err != nil {
-		log.Error(err, "")
+		log.Error(err, "Failed to add controller to manger")
 		os.Exit(1)
 	}
 
