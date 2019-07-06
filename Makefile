@@ -43,5 +43,6 @@ docker-build:
 docker-login:
 	docker login --username $(DOCKER_USERNAME)
 
+.PHONY: docker-push
 docker-push: docker-build docker-login
 	docker push $(DOCKER_IMAGE):${tag}
