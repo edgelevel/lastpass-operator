@@ -1,2 +1,9 @@
-username: ""
-password: ""
+image:
+  repository: niqdev/lastpass-operator
+  tag: 0.1.0
+
+replicas: 1
+
+lastpass:
+  username: ""
+  password: ""

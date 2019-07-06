@@ -72,7 +72,7 @@ type ReconcileLastPassSecret struct {
 
 // Reconcile reads that state of the cluster for a LastPassSecret object and makes changes based on the state read
 // and what is in the LastPassSecret.Spec
-// 1) check that LP_USERNAME and LP_PASSWORD environment variables are defined or exit with error
+// 1) check that LASTPASS_USERNAME and LASTPASS_PASSWORD environment variables are defined or exit with error
 // 2) check that "lpass" binary is available or exit with error
 // 3) execute "lpass login"
 // 4) fetch LastPassSecret instances

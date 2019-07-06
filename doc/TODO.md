@@ -22,14 +22,6 @@ kubectl get secret lastpass-master-secret -o yaml
 echo '' | base64 --decode
 ```
 
-1) apply master secret manually
-2) operator: check wait for the master secret to be available
-3) retrieve master credentials - no MFA allowed or request login allowed (skip secret)
-4) exec `lpass` login
-5) create secrets
-6) add status: verify `last_modified_gmt` and `last_touch`
-7) logout every time after all?
-
 ---
 
 **TODO**

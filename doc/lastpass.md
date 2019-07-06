@@ -7,7 +7,7 @@
 CLI
 ```bash
 # login
-echo PASSWORD | LPASS_DISABLE_PINENTRY=1 lpass login --trust USERNAME
+echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 
 # list
 lpass ls
@@ -26,8 +26,8 @@ docker build -t niqdev/lastpass-cli -f example/lastpass-alpine .
 
 # temporary container
 docker run --rm -it niqdev/lastpass-cli /bin/sh
-echo PASSWORD | LPASS_DISABLE_PINENTRY=1 lpass login --trust USERNAME
-echo PASSWORD | lpass show <GROUP>/<NAME> --json --expand-multi
+echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
+echo <PASSWORD> | lpass show <GROUP>/<NAME> --json --expand-multi
 ```
 
 Docker Ubuntu (673MB)

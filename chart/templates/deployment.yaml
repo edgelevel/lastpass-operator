@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: lastpass-operator
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       name: lastpass-operator
@@ -15,12 +15,12 @@ spec:
       serviceAccountName: lastpass-operator
       containers:
         - name: lastpass-operator
-          # TODO <name><version>
-          image: REPLACE_IMAGE
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           command:
           - lastpass-operator
           imagePullPolicy: Always
           env:
+            # default
             - name: WATCH_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -31,3 +31,14 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "lastpass-operator"
+            # custom
+            - name: LASTPASS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: lastpass-master-secret
+                  key: username
+            - name: LASTPASS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lastpass-master-secret
+                  key: password

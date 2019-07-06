@@ -31,7 +31,6 @@ endif
 .PHONY: all
 all: requirements
 
-# example: make docker-build tag=v0.0.1
 .PHONY: docker-build
 docker-build:
 	operator-sdk build niqdev/lastpass-operator:${tag}
