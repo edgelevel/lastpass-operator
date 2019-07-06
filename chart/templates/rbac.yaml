@@ -1,0 +1,37 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: null
+  name: lastpass-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - niqdev.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lastpass-operator
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: lastpass-operator
+subjects:
+  - kind: ServiceAccount
+    name: lastpass-operator
+roleRef:
+  kind: Role
+  name: lastpass-operator
+  apiGroup: rbac.authorization.k8s.io

@@ -15,7 +15,7 @@ spec:
       serviceAccountName: lastpass-operator
       containers:
         - name: lastpass-operator
-          # Replace this with the built image name
+          # TODO <name><version>
           image: REPLACE_IMAGE
           command:
           - lastpass-operator

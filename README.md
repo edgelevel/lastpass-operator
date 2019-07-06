@@ -127,8 +127,6 @@ kubectl apply -f deploy/crds/niqdev_v1alpha1_lastpasssecret_crd.yaml
 # run locally
 export OPERATOR_NAME=lastpass-operator
 operator-sdk up local --namespace=default --verbose
-
-operator-sdk build niqdev/lastpass-operator:v0.0.1
 ```
 
 ---
