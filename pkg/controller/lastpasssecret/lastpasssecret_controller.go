@@ -21,11 +21,6 @@ import (
 
 var log = logf.Log.WithName("controller_lastpasssecret")
 
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
 // Add creates a new LastPassSecret Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
@@ -51,7 +46,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// TODO(user): Modify this to be the types you create that are owned by the primary resource
+	// TODO Secret
 	// Watch for changes to secondary resource Pods and requeue the owner LastPassSecret
 	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
@@ -77,11 +72,13 @@ type ReconcileLastPassSecret struct {
 
 // Reconcile reads that state of the cluster for a LastPassSecret object and makes changes based on the state read
 // and what is in the LastPassSecret.Spec
-// TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
-// a Pod as an example
-// Note:
-// The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
+// 1) check that LP_USERNAME and LP_PASSWORD environment variables are defined or exit with error
+// 2) check that "lpass" binary is available or exit with error
+// 3) execute "lpass login"
+// 4) fetch LastPassSecret instances
+// 		* create a native k8s secret if doesn't exist already
+// 		* update secret status if "last_modified_gmt" or "last_touch" are changed
+// 5) execute "lpass logout"
 func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling LastPassSecret")

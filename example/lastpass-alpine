@@ -1,0 +1,5 @@
+FROM alpine:latest
+
+RUN apk add --update --no-cache \
+  lastpass-cli && \
+  rm -f /var/cache/apk/*
