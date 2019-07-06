@@ -15,12 +15,9 @@ mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
 cd lastpass-operator
 
-# build operator
-dep ensure
-make docker-build tag=<VERSION>
-
-# TODO login + publish
-# https://hub.docker.com/search/?q=niqdev&type=image
+# build and publish
+# TODO https://hub.docker.com/search/?q=niqdev&type=image
+make docker-push tag=0.1.0
 
 # apply chart
 kubectl create namespace lastpass

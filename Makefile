@@ -7,6 +7,9 @@ CMD_GO := $(shell command -v go 2> /dev/null)
 CMD_DEP := $(shell command -v dep 2> /dev/null)
 CMD_OPERATOR_SDK := $(shell command -v operator-sdk 2> /dev/null)
 
+DOCKER_USERNAME := niqdev
+DOCKER_IMAGE := $(DOCKER_USERNAME)/lastpass-operator
+
 .PHONY: requirements
 requirements:
 ifndef CMD_DOCKER
@@ -33,4 +36,12 @@ all: requirements
 
 .PHONY: docker-build
 docker-build:
-	operator-sdk build niqdev/lastpass-operator:${tag}
+	dep ensure
+	operator-sdk build $(DOCKER_IMAGE):${tag}
+
+.PHONY: docker-login
+docker-login:
+	docker login --username $(DOCKER_USERNAME)
+
+docker-push: docker-build docker-login
+	docker push $(DOCKER_IMAGE):${tag}
