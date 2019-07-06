@@ -72,7 +72,12 @@ sudo snap install --classic go
 # dep
 curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
-# TODO operator-sdk
+# operator-sdk (from source)
+go get -d github.com/operator-framework/operator-sdk
+cd $GOPATH/src/github.com/operator-framework/operator-sdk
+git checkout master
+make dep
+make install
 ```
 
 macOS
@@ -112,6 +117,19 @@ operator-sdk generate k8s
 
 # add controller
 operator-sdk add controller --api-version=niqdev.com/v1alpha1 --kind=LastPassSecret
+```
+
+Run on [minkube](https://github.com/kubernetes/minikube)
+```bash
+# requires virtualbox
+minikube start
+
+# apply crd
+kubectl apply -f deploy/crds/niqdev_v1alpha1_lastpasssecret_crd.yaml
+
+# run locally
+export OPERATOR_NAME=lastpass-operator
+operator-sdk up local --namespace=default --verbose
 ```
 
 ---
