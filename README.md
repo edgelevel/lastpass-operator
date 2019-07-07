@@ -29,6 +29,8 @@ kubectl apply -f chart/templates/crd.yaml
 
 # run locally
 export OPERATOR_NAME=lastpass-operator
+export LASTPASS_USERNAME=myUsername
+export LASTPASS_PASSWORD=myPassword
 operator-sdk up local --namespace=default --verbose
 ```
 
