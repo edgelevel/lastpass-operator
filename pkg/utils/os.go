@@ -8,9 +8,9 @@ import (
 
 func GetEnvOrDie(key string) string {
 	if value, ok := os.LookupEnv(key); ok {
-		log.Printf("Environment variable found: [%s=%s]", key, value)
+		log.Printf("Environment variable found: [%s]", key)
 		return value
 	} else {
-		panic(fmt.Sprintf("No environment variable found with name: %s", key))
+		panic(fmt.Sprintf("No environment variable found: [%s]", key))
 	}
 }

@@ -18,8 +18,8 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/niqdev/lastpass-operator/pkg/utils"
 	"github.com/niqdev/lastpass-operator/pkg/lastpass"
+	"github.com/niqdev/lastpass-operator/pkg/utils"
 )
 
 var log = logf.Log.WithName("controller_lastpasssecret")
@@ -75,7 +75,6 @@ type ReconcileLastPassSecret struct {
 
 // Reconcile reads that state of the cluster for a LastPassSecret object and makes changes based on the state read
 // and what is in the LastPassSecret.Spec
-// 3) execute "lpass login"
 // 4) fetch LastPassSecret instances
 // 		* create a native k8s secret if doesn't exist already
 // 		* update secret status if "last_modified_gmt" or "last_touch" are changed
@@ -87,10 +86,12 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 	// Check that the environment variables are defined or exit. See also lastpass-master-secret
 	lastPassUsername := utils.GetEnvOrDie("LASTPASS_USERNAME")
 	lastPassPassword := utils.GetEnvOrDie("LASTPASS_PASSWORD")
-	reqLogger.Info("Environment variables found", "lastPassUsername", lastPassUsername, "lastPassPassword", lastPassPassword)
 
 	// Check that "lpass" binary is available or exit
 	lastpass.VerifyCliExistsOrDie()
+
+	// Login to LastPass or exit if the credentials are invalid
+	lastpass.LoginOrDie(lastPassUsername, lastPassPassword)
 
 	// Fetch the LastPassSecret instance
 	instance := &niqdevv1alpha1.LastPassSecret{}
