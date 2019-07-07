@@ -7,6 +7,7 @@
 ## Development
 
 * [LastPass](doc/lastpass.md)
+* [golang](doc/golang.md)
 * [operator-sdk](doc/operator.md)
 
 ```bash
@@ -47,6 +48,18 @@ helm template \
   --set lastpass.username="myUsername" \
   --set lastpass.password="myPassword" \
   chart/ | kubectl apply -n lastpass -f -
+```
+
+---
+
+TODO
+
+```bash
+# TODO example/niqdev_v1alpha1_lastpasssecret_cr.yaml
+kubectl apply -f lastpass-master-secret.yaml
+kubectl get secrets
+kubectl get secret lastpass-master-secret -o yaml
+echo '' | base64 --decode
 ```
 
 TODO

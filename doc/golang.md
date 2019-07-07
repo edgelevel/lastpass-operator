@@ -1,19 +1,10 @@
-## Development
+## golang
+
+* [go](https://golang.org/doc) documentation
+* [dep](https://golang.github.io/dep/docs/introduction.html) Dependency management for Go
 
 ```bash
-# TODO example/niqdev_v1alpha1_lastpasssecret_cr.yaml
-kubectl apply -f lastpass-master-secret.yaml
-kubectl get secrets
-kubectl get secret lastpass-master-secret -o yaml
-echo '' | base64 --decode
-```
-
----
-
-**TODO**
-
-```bash
-# clone sources
+# download source
 mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 git clone git@github.com:niqdev/lastpass-operator.git
 
@@ -24,6 +15,7 @@ dep init
 dep ensure -add github.com/USER/DEP1 github.com/USER/DEP2
 # example
 dep ensure -add github.com/spf13/cobra
+dep ensure -add github.com/codeskyblue/go-sh
 
 # verify and update all dependencies
 dep status
