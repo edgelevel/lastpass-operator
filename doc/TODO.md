@@ -1,21 +1,7 @@
 ## Development
 
-Run on [minkube](https://github.com/kubernetes/minikube)
 ```bash
-# requires virtualbox
-minikube start
-
-# apply crd
-kubectl apply -f deploy/crds/niqdev_v1alpha1_lastpasssecret_crd.yaml
-
-# run locally
-export OPERATOR_NAME=lastpass-operator
-operator-sdk up local --namespace=default --verbose
-```
-
----
-
-```bash
+# TODO example/niqdev_v1alpha1_lastpasssecret_cr.yaml
 kubectl apply -f lastpass-master-secret.yaml
 kubectl get secrets
 kubectl get secret lastpass-master-secret -o yaml
