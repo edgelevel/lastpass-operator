@@ -30,14 +30,15 @@ func VerifyCliExistsOrDie() {
 	log.Printf("lpass binary found")
 }
 
-// FIXME re-attempt, don't die - Error: HTTP response code said error
-func LoginOrDie(username string, password string) {
+func Login(username string, password string) error {
 	// echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 	out, err := sh.NewSession().SetEnv("LPASS_DISABLE_PINENTRY", "1").Command("echo", password).Command("lpass", "login", "--trust", username).Output()
 	if err != nil || "" == string(out) {
-		panic("Unable to login: verify credentials")
+		// sometimes returns error: "Error: HTTP response code said error" even if the credentials are valid
+		return fmt.Errorf("unable to login: verify credentials - %s", err)
 	}
 	log.Printf("Succesfully logged in")
+	return nil
 }
 
 func RequestSecret(group string, name string) (SecretResponse, error) {
@@ -53,6 +54,7 @@ func RequestSecret(group string, name string) (SecretResponse, error) {
 		return response, fmt.Errorf("invalid secret: [%s] - %s", fullName, err)
 	}
 
+	// TODO print in debug only
 	log.Printf("Secret response: %s", out)
 
 	// decode JSON structure into Go structure
@@ -63,6 +65,7 @@ func RequestSecret(group string, name string) (SecretResponse, error) {
 
 	log.Printf("JSON secret response size: %d", len(response))
 
+	// TODO remove
 	for secret := range response {
 		log.Printf("Secret id: %s", response[secret].Id)
 	}

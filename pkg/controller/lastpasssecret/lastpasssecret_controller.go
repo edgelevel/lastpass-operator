@@ -90,8 +90,11 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 	// Check that "lpass" binary is available or exit
 	lastpass.VerifyCliExistsOrDie()
 
-	// Login to LastPass or exit if the credentials are invalid
-	lastpass.LoginOrDie(lastPassUsername, lastPassPassword)
+	// Login to LastPass
+	if err := lastpass.Login(lastPassUsername, lastPassPassword); err != nil {
+		// Attempt login again, sometimes it fails even if the credentials are valid - requeue the request.
+		return reconcile.Result{}, err
+	}
 
 	// Fetch the LastPassSecret instance
 	instance := &niqdevv1alpha1.LastPassSecret{}
