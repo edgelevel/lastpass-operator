@@ -2,6 +2,7 @@
 
 * [go](https://golang.org/doc) documentation
 * [dep](https://golang.github.io/dep/docs/introduction.html) Dependency management for Go
+* [Convert JSON into a Go type definition](https://mholt.github.io/json-to-go/)
 
 ```bash
 # download source

@@ -107,6 +107,9 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
+	// TODO
+	lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+
 	// Define a new Pod object
 	pod := newPodForCR(instance)
 
