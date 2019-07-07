@@ -80,6 +80,22 @@
   version = "v0.2.0"
 
 [[projects]]
+  digest = "1:551bcb7f51fe5dfc7a2f632cf5c613a531f7a119a7bcf4726df4e12b92c3286a"
+  name = "github.com/codegangsta/inject"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "37d7f8432a3e684eef9b2edece76bdfa6ac85b39"
+  version = "v1.0-rc1"
+
+[[projects]]
+  digest = "1:db546479fc2c971bf1861cabed0fc92545a5cab02113fc774d8a526dd3c933ae"
+  name = "github.com/codeskyblue/go-sh"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "b097669b1569203c3ce05a6b8717d43140fdb3d5"
+  version = "0.2"
+
+[[projects]]
   digest = "1:0c4193043b1a33c7f9ba4ea42b8af2c09bb3d51970212d42e4dac8aa217b4ca5"
   name = "github.com/coreos/prometheus-operator"
   packages = [
@@ -1087,6 +1103,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/codeskyblue/go-sh",
     "github.com/go-openapi/spec",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/pkg/leader",
