@@ -7,6 +7,7 @@
 ## Development
 
 * [LastPass](doc/lastpass.md)
+* [Setup](doc/setup.md)
 * [golang](doc/golang.md)
 * [operator-sdk](doc/operator.md)
 
