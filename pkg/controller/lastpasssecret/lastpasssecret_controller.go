@@ -110,8 +110,15 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	// TODO
-	lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	secretRespone, err := lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	if err != nil {
+		// Error parsing the response - requeue the request.
+		return reconcile.Result{}, err
+	}
+
+	for secret := range secretRespone {
+		reqLogger.Info("Secret response", "id", secretRespone[secret].ID)
+	}
 
 	// Define a new Pod object
 	pod := newPodForCR(instance)

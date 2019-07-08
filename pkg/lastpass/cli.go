@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/codeskyblue/go-sh"
 	"log"
+
+	"github.com/codeskyblue/go-sh"
 )
 
+// SecretResponse represents the http respone
+// For more examples see doc/lpass-example.txt
 // https://mholt.github.io/json-to-go/
 type SecretResponse []struct {
-	Id              string `json:"id"`
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	Fullname        string `json:"fullname"`
 	Username        string `json:"username"`
@@ -22,6 +25,7 @@ type SecretResponse []struct {
 	Note            string `json:"note"`
 }
 
+// VerifyCliExistsOrDie verifies that lastpass-cli is properly installed
 func VerifyCliExistsOrDie() {
 	out, err := sh.Command("which", "lpass").Output()
 	if err != nil || "" == string(out) {
@@ -30,6 +34,7 @@ func VerifyCliExistsOrDie() {
 	log.Printf("lpass binary found")
 }
 
+// Login attempts to login using lastpass-cli
 func Login(username string, password string) error {
 	// echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 	out, err := sh.NewSession().SetEnv("LPASS_DISABLE_PINENTRY", "1").Command("echo", password).Command("lpass", "login", "--trust", username).Output()
@@ -41,6 +46,7 @@ func Login(username string, password string) error {
 	return nil
 }
 
+// RequestSecret returns one or more secrets using lastpass-cli
 func RequestSecret(group string, name string) (SecretResponse, error) {
 
 	fullName := buildFullName(group, name)
@@ -65,14 +71,10 @@ func RequestSecret(group string, name string) (SecretResponse, error) {
 
 	log.Printf("JSON secret response size: %d", len(response))
 
-	// TODO remove
-	for secret := range response {
-		log.Printf("Secret id: %s", response[secret].Id)
-	}
-
 	return response, nil
 }
 
+// returns <GROUP>/<NAME> or <NAME>
 func buildFullName(group string, name string) string {
 	var b bytes.Buffer
 	if group != "" {
