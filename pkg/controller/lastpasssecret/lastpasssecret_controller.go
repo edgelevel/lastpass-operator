@@ -49,9 +49,8 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// TODO Secret
 	// Watch for changes to secondary resource Pods and requeue the owner LastPassSecret
-	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
+	err = c.Watch(&source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
 		OwnerType:    &niqdevv1alpha1.LastPassSecret{},
 	})
@@ -110,64 +109,64 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	secretRespone, err := lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	internalSecrets, err := lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
 	if err != nil {
 		// Error parsing the response - requeue the request.
 		return reconcile.Result{}, err
 	}
 
-	for secret := range secretRespone {
-		reqLogger.Info("Secret response", "id", secretRespone[secret].ID)
-	}
+	for index := range internalSecrets {
+		reqLogger.Info("Secret response", "id", internalSecrets[index].ID)
 
-	// Define a new Pod object
-	pod := newPodForCR(instance)
+		// Define a new Secret object
+		secret := newSecretForCR(instance, internalSecrets[index])
 
-	// Set LastPassSecret instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
-	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
-		if err != nil {
+		// Set LastPassSecret instance as the owner and controller
+		if err := controllerutil.SetControllerReference(instance, secret, r.scheme); err != nil {
+			// Interrupt and exit the loop (skip other secrets)
 			return reconcile.Result{}, err
 		}
 
-		// Pod created successfully - don't requeue
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		return reconcile.Result{}, err
+		// Check if this Secret already exists
+		found := &corev1.Secret{}
+		err = r.client.Get(context.TODO(), types.NamespacedName{Name: secret.Name, Namespace: secret.Namespace}, found)
+		if err != nil && errors.IsNotFound(err) {
+			reqLogger.Info("Creating a new Secret", "Secret.Namespace", secret.Namespace, "Secret.Name", secret.Name)
+			err = r.client.Create(context.TODO(), secret)
+			if err != nil {
+				return reconcile.Result{}, err
+			}
+			// Secret created successfully - don't requeue
+		} else if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		// Secret already exists - don't requeue
+		reqLogger.Info("Skip reconcile: Secret already exists", "Pod.Namespace", found.Namespace, "Secret.Name", found.Name)
 	}
 
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *niqdevv1alpha1.LastPassSecret) *corev1.Pod {
+func newSecretForCR(cr *niqdevv1alpha1.LastPassSecret, secret lastpass.InternalSecret) *corev1.Secret {
 	labels := map[string]string{
 		"app": cr.Name,
 	}
-	return &corev1.Pod{
+
+	// TODO status with LastModifiedGmt and LastTouch
+
+	data := map[string]string{}
+	data["USERNAME"] = secret.Username
+	data["PASSWORD"] = secret.Password
+	data["URL"] = secret.URL
+	data["NOTE"] = secret.Note
+
+	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
+			Name:      cr.Name + "-" + secret.ID,
 			Namespace: cr.Namespace,
 			Labels:    labels,
 		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-		},
+		StringData: data,
 	}
 }

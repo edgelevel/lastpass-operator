@@ -9,10 +9,10 @@ import (
 	"github.com/codeskyblue/go-sh"
 )
 
-// SecretResponse represents the http respone
+// InternalSecret represents a LastPass secret
 // For more examples see doc/lpass-example.txt
 // https://mholt.github.io/json-to-go/
-type SecretResponse []struct {
+type InternalSecret struct {
 	ID              string `json:"id"`
 	Name            string `json:"name"`
 	Fullname        string `json:"fullname"`
@@ -47,31 +47,31 @@ func Login(username string, password string) error {
 }
 
 // RequestSecret returns one or more secrets using lastpass-cli
-func RequestSecret(group string, name string) (SecretResponse, error) {
+func RequestSecret(group string, name string) ([]InternalSecret, error) {
 
 	fullName := buildFullName(group, name)
-	response := SecretResponse{}
+	secrets := []InternalSecret{}
 
 	log.Printf("Request secret: [group=%s][name=%s][fullName=%s]", group, name, fullName)
 
 	// lpass show <GROUP>/<NAME> --json --expand-multi
 	out, err := sh.Command("lpass", "show", fullName, "--json", "--expand-multi").Output()
 	if err != nil {
-		return response, fmt.Errorf("invalid secret: [%s] - %s", fullName, err)
+		return secrets, fmt.Errorf("invalid secret: [%s] - %s", fullName, err)
 	}
 
 	// TODO print in debug only
 	log.Printf("Secret response: %s", out)
 
 	// decode JSON structure into Go structure
-	jsonErr := json.Unmarshal([]byte(out), &response)
+	jsonErr := json.Unmarshal([]byte(out), &secrets)
 	if jsonErr != nil {
-		return response, fmt.Errorf("invalid response: [%s] - %s", fullName, err)
+		return secrets, fmt.Errorf("invalid JSON: [%s] - %s", fullName, err)
 	}
 
-	log.Printf("JSON secret response size: %d", len(response))
+	log.Printf("Found [%d] secrets", len(secrets))
 
-	return response, nil
+	return secrets, nil
 }
 
 // returns <GROUP>/<NAME> or <NAME>
