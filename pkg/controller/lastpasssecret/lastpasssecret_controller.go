@@ -74,9 +74,7 @@ type ReconcileLastPassSecret struct {
 
 // Reconcile reads that state of the cluster for a LastPassSecret object and makes changes based on the state read
 // and what is in the LastPassSecret.Spec
-// 4) fetch LastPassSecret instances
-// 		* create a native k8s secret if doesn't exist already
-// 		* update secret status if "last_modified_gmt" or "last_touch" are changed
+// TODO update secret if "last_modified_gmt" or "last_touch" change (?)
 func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling LastPassSecret")
@@ -153,22 +151,37 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 
 func newSecretForCR(cr *niqdevv1alpha1.LastPassSecret, secret lastpass.InternalSecret) *corev1.Secret {
 	labels := map[string]string{
-		"app": cr.Name,
+		"app": "lastpass-operator",
+	}
+	annotations := map[string]string{
+		"id":              secret.ID,
+		"group":           secret.Group,
+		"name":            secret.Name,
+		"fullname":        secret.Fullname,
+		"lastModifiedGmt": secret.LastModifiedGmt,
+		"lastTouch":       secret.LastTouch,
 	}
 
-	// TODO status with LastModifiedGmt and LastTouch
-
 	data := map[string]string{}
-	data["USERNAME"] = secret.Username
-	data["PASSWORD"] = secret.Password
-	data["URL"] = secret.URL
-	data["NOTE"] = secret.Note
+	if cr.Spec.ItemRef.WithUsername {
+		data["USERNAME"] = secret.Username
+	}
+	if cr.Spec.ItemRef.WithPassword {
+		data["PASSWORD"] = secret.Password
+	}
+	if cr.Spec.ItemRef.WithUrl {
+		data["URL"] = secret.URL
+	}
+	if cr.Spec.ItemRef.WithNote {
+		data["NOTE"] = secret.Note
+	}
 
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-" + secret.ID,
-			Namespace: cr.Namespace,
-			Labels:    labels,
+			Name:        cr.Name + "-" + secret.ID,
+			Namespace:   cr.Namespace,
+			Labels:      labels,
+			Annotations: annotations,
 		},
 		StringData: data,
 	}

@@ -56,10 +56,11 @@ helm template \
 TODO
 
 ```bash
-# TODO example/niqdev_v1alpha1_lastpasssecret_cr.yaml
-kubectl apply -f lastpass-master-secret.yaml
+kubectl apply -f example/niqdev_v1alpha1_lastpasssecret_cr.yaml
+kubectl apply -f example/cr_note_json.yaml
+
 kubectl get secrets
-kubectl get secret lastpass-master-secret -o yaml
+kubectl get secret example-lastpass-secret-<SECRET_ID> -o yaml
 echo '' | base64 --decode
 ```
 

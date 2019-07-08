@@ -1,0 +1,9 @@
+apiVersion: niqdev.com/v1alpha1
+kind: LastPassSecret
+metadata:
+  name: json-secret
+spec:
+  itemRef:
+    group: example
+    name: secure-note-json
+    withNote: true
