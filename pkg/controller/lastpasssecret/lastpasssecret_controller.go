@@ -77,7 +77,6 @@ type ReconcileLastPassSecret struct {
 // 4) fetch LastPassSecret instances
 // 		* create a native k8s secret if doesn't exist already
 // 		* update secret status if "last_modified_gmt" or "last_touch" are changed
-// 5) execute "lpass logout"
 func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling LastPassSecret")
@@ -109,14 +108,17 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	internalSecrets, err := lastpass.RequestSecret(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	// Request secrets
+	internalSecrets, err := lastpass.RequestSecrets(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	// Logout
+	lastpass.Logout()
 	if err != nil {
 		// Error parsing the response - requeue the request.
 		return reconcile.Result{}, err
 	}
 
 	for index := range internalSecrets {
-		reqLogger.Info("Secret response", "id", internalSecrets[index].ID)
+		reqLogger.Info("Verify internal secret", "id", internalSecrets[index].ID)
 
 		// Define a new Secret object
 		secret := newSecretForCR(instance, internalSecrets[index])
@@ -137,6 +139,7 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 				return reconcile.Result{}, err
 			}
 			// Secret created successfully - don't requeue
+			continue
 		} else if err != nil {
 			return reconcile.Result{}, err
 		}

@@ -46,8 +46,18 @@ func Login(username string, password string) error {
 	return nil
 }
 
-// RequestSecret returns one or more secrets using lastpass-cli
-func RequestSecret(group string, name string) ([]InternalSecret, error) {
+// Logout using lastpass-cli
+func Logout() {
+	// lpass logout --force
+	_, err := sh.Command("lpass", "logout", "--force").Output()
+	if err != nil {
+		log.Printf("Ignore error while logging out: %s", err)
+	}
+	log.Printf("Succesfully logged out")
+}
+
+// RequestSecrets returns one or more secrets using lastpass-cli
+func RequestSecrets(group string, name string) ([]InternalSecret, error) {
 
 	fullName := buildFullName(group, name)
 	secrets := []InternalSecret{}
