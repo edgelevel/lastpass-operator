@@ -103,7 +103,8 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 </p>
 
 * The recommended way to install the operator in your cluster is to use the provided Helm [chart](chart/)
-* This operator has been mainly developed to simplify the secrets management for low security environments, if you are a security paranoid you should audit the project and assess if it meets the security standard of your organization
+* *TODO for a working example you should have a look at [niqdev/do-k8s](https://github.com/niqdev/do-k8s)*
+* This operator has been mainly developed to simplify the secret management of low security environments, if you are a security paranoid you should audit the project and assess if it meets the security standard of your organization
 * The operator, for obvious reasons, won't work if you have MFA enabled on LastPass or your credentials "Require Password Reprompt"
 * Once [this](https://github.com/argoproj/argo-cd/issues/1786) Argo CD feature will be implemented it should allow to bind secrets directly to an `Application`
 
