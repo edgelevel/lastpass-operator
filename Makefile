@@ -35,7 +35,7 @@ endif
 all: requirements
 
 .PHONY: docker-build
-docker-build:
+docker-build: requirements
 	dep ensure
 	operator-sdk build $(DOCKER_IMAGE):${tag}
 
