@@ -1,17 +1,103 @@
 # lastpass-operator
 
-> TODO
+A Kubernetes Operator to manage [secrets](https://kubernetes.io/docs/concepts/configuration/secret) stored in [LastPass](https://www.lastpass.com) password manager
 
-* TODO version of lastpass-cli
+Suppose you have some credentials store in LastPass
+```bash
+$ lpass show example/my-secret --json
+[
+  {
+    "id": "8190226423897406876",
+    "name": "my-secret",
+    "fullname": "example/my-secret",
+    "username": "whoami",
+    "password": "s3cr3t",
+    "last_modified_gmt": "1562690587",
+    "last_touch": "0",
+    "group": "example",
+    "url": "https://lastpass.com",
+    "note": "{\"myKey\":\"myValue\"}"
+  }
+]
+```
 
-* [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret)
+Define a `LastPass` [Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources) to automatically manage the lifecycle of your secrets in Kubernetes
+```bash
+$ cat example/niqdev_v1alpha1_lastpass_cr.yaml
+apiVersion: niqdev.com/v1alpha1
+kind: LastPass
+metadata:
+  name: example-lastpass
+spec:
+  secretRef:
+    group: example
+    name: my-secret
+    withUsername: true
+    withPassword: true
+    withUrl: true
+    withNote: true
+  # TODO
+  syncPolicy:
+    enable: true
+    refresh: 60
+
+# create custom resource
+$ kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
+```
+
+The operator will take care of create native Kubernetes secretes and keep them up to date that if you rotate them from the website for example
+```bash
+# verify
+$ kubectl get lastpass
+$ kubectl get secrets
+
+# inspect
+$ kubectl get secret example-lastpass-8190226423897406876 -o yaml
+apiVersion: v1
+data:
+  NOTE: eyJteUtleSI6Im15VmFsdWUifQ==
+  PASSWORD: czNjcjN0
+  URL: aHR0cHM6Ly9sYXN0cGFzcy5jb20=
+  USERNAME: d2hvYW1p
+kind: Secret
+metadata:
+  annotations:
+    fullname: example/my-secret
+    group: example
+    id: "8190226423897406876"
+    lastModifiedGmt: "1562690587"
+    lastTouch: "0"
+    name: my-secret
+  creationTimestamp: "2019-07-09T15:00:13Z"
+  labels:
+    app: lastpass-operator
+  name: example-lastpass-8190226423897406876
+  namespace: default
+  ownerReferences:
+  - apiVersion: niqdev.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: LastPass
+    name: example-lastpass
+    uid: 0687d5a7-5f02-4ee4-a6c4-011c734f4149
+  resourceVersion: "113312"
+  selfLink: /api/v1/namespaces/default/secrets/example-lastpass-8190226423897406876
+  uid: 382008d2-8999-444d-86c8-e4f29eecbe9f
+type: Opaque
+
+# check values
+$ echo 'czNjcjN0' | base64 --decode
+s3cr3t
+$ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
+{"myKey":"myValue"}
+```
 
 ## Development
 
-* [LastPass](doc/lastpass.md)
 * [Setup](doc/setup.md)
 * [golang](doc/golang.md)
 * [operator-sdk](doc/operator.md)
+* [LastPass](doc/lastpass.md)
 
 ```bash
 # download source
@@ -53,18 +139,7 @@ helm template \
   chart/ | kubectl apply -n lastpass -f -
 ```
 
----
-
-TODO
-
-```bash
-kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
-
-kubectl get secrets
-kubectl get secret example-lastpass-<SECRET_ID> -o yaml
-echo '' | base64 --decode
-```
-
 TODO
 * [ ] fix `lpass` permissions in Dockerfile
 * [ ] fix rules in `rbac.yaml`
+* [ ] version of lastpass-cli
