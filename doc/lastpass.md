@@ -1,8 +1,8 @@
 ## LastPass
 
-* [LastPass](https://www.lastpass.com)
+* [Website](https://www.lastpass.com)
 * [lastpass-cli](https://github.com/lastpass/lastpass-cli)
-* `lpass` [examples](lpass-example.txt)
+* `lpass` [examples](../example/lpass-examples.txt)
 
 CLI
 ```bash
