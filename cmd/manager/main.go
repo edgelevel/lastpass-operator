@@ -68,7 +68,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Info("Running in namespace: %s", namespace)
+	log.Info(fmt.Sprintf("Running in namespace: %s", namespace))
 
 	// Get a config to talk to the apiserver
 	cfg, err := config.GetConfig()
