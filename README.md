@@ -2,7 +2,9 @@
 
 A Kubernetes Operator to manage [secrets](https://kubernetes.io/docs/concepts/configuration/secret) stored in [LastPass](https://www.lastpass.com) password manager
 
-Suppose you have some credentials store in LastPass
+## How it works
+
+Suppose you have some credentials stored in LastPass
 ```bash
 $ lpass show example/my-secret --json
 [
@@ -45,7 +47,7 @@ spec:
 $ kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
 ```
 
-The operator will take care of create native Kubernetes secretes and keep them up to date that if you rotate them from the website for example
+The operator will take care of create native Kubernetes secrets and keep them up to date that if they change
 ```bash
 # verify
 $ kubectl get lastpass
