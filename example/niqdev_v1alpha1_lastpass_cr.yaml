@@ -1,13 +1,13 @@
 apiVersion: niqdev.com/v1alpha1
-kind: LastPassSecret
+kind: LastPass
 metadata:
-  name: example-lastpass-secret
+  name: example-lastpass
 spec:
-  itemRef:
+  secretRef:
     # optional (default "")
     group: example
     # required
-    name: example-pwd
+    name: my-secret
     # optional (default false)
     withUsername: true
     # optional (default false)

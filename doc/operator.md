@@ -22,9 +22,9 @@ mkdir -p $GOPATH/src/github.com/niqdev && cd $_
 operator-sdk new lastpass-operator --dep-manager=dep
 
 # add crd
-operator-sdk add api --api-version=niqdev.com/v1alpha1 --kind=LastPassSecret
+operator-sdk add api --api-version=niqdev.com/v1alpha1 --kind=LastPass
 operator-sdk generate k8s
 
 # add controller
-operator-sdk add controller --api-version=niqdev.com/v1alpha1 --kind=LastPassSecret
+operator-sdk add controller --api-version=niqdev.com/v1alpha1 --kind=LastPass
 ```

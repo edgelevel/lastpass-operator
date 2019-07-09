@@ -2,6 +2,8 @@
 
 > TODO
 
+* TODO version of lastpass-cli
+
 * [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret)
 
 ## Development
@@ -40,7 +42,7 @@ Run as a Deployment inside the cluster
 ```bash
 # build and publish
 # https://hub.docker.com/repository/docker/niqdev/lastpass-operator
-make docker-push tag=0.1.0
+make docker-push tag=0.2.0
 
 # apply chart
 kubectl create namespace lastpass
@@ -56,11 +58,10 @@ helm template \
 TODO
 
 ```bash
-kubectl apply -f example/niqdev_v1alpha1_lastpasssecret_cr.yaml
-kubectl apply -f example/cr_note_json.yaml
+kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
 
 kubectl get secrets
-kubectl get secret example-lastpass-secret-<SECRET_ID> -o yaml
+kubectl get secret example-lastpass-<SECRET_ID> -o yaml
 echo '' | base64 --decode
 ```
 

@@ -1,9 +1,11 @@
-package lastpasssecret
+package lastpass
 
 import (
 	"context"
 
 	niqdevv1alpha1 "github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1"
+	"github.com/niqdev/lastpass-operator/pkg/lastpass"
+	"github.com/niqdev/lastpass-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,14 +19,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/niqdev/lastpass-operator/pkg/lastpass"
-	"github.com/niqdev/lastpass-operator/pkg/utils"
 )
 
-var log = logf.Log.WithName("controller_lastpasssecret")
+var log = logf.Log.WithName("controller_lastpass")
 
-// Add creates a new LastPassSecret Controller and adds it to the Manager. The Manager will set fields on the Controller
+// Add creates a new LastPass Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
@@ -32,27 +31,27 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileLastPassSecret{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	return &ReconcileLastPass{client: mgr.GetClient(), scheme: mgr.GetScheme()}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
 func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
-	c, err := controller.New("lastpasssecret-controller", mgr, controller.Options{Reconciler: r})
+	c, err := controller.New("lastpass-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
 
-	// Watch for changes to primary resource LastPassSecret
-	err = c.Watch(&source.Kind{Type: &niqdevv1alpha1.LastPassSecret{}}, &handler.EnqueueRequestForObject{})
+	// Watch for changes to primary resource LastPass
+	err = c.Watch(&source.Kind{Type: &niqdevv1alpha1.LastPass{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
 
-	// Watch for changes to secondary resource Pods and requeue the owner LastPassSecret
+	// Watch for changes to secondary resource Secrets and requeue the owner LastPass
 	err = c.Watch(&source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &niqdevv1alpha1.LastPassSecret{},
+		OwnerType:    &niqdevv1alpha1.LastPass{},
 	})
 	if err != nil {
 		return err
@@ -61,23 +60,25 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
-// blank assignment to verify that ReconcileLastPassSecret implements reconcile.Reconciler
-var _ reconcile.Reconciler = &ReconcileLastPassSecret{}
+// blank assignment to verify that ReconcileLastPass implements reconcile.Reconciler
+var _ reconcile.Reconciler = &ReconcileLastPass{}
 
-// ReconcileLastPassSecret reconciles a LastPassSecret object
-type ReconcileLastPassSecret struct {
+// ReconcileLastPass reconciles a LastPass object
+type ReconcileLastPass struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
 	client client.Client
 	scheme *runtime.Scheme
 }
 
-// Reconcile reads that state of the cluster for a LastPassSecret object and makes changes based on the state read
-// and what is in the LastPassSecret.Spec
-// TODO update secret if "last_modified_gmt" or "last_touch" change (?)
-func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+// Reconcile reads that state of the cluster for a LastPass object and makes changes based on the state read
+// and what is in the LastPass.Spec
+// Note:
+// The Controller will requeue the Request to be processed again if the returned error is non-nil or
+// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
+func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling LastPassSecret")
+	reqLogger.Info("Reconciling LastPass")
 
 	// Check that the environment variables are defined or exit. See also lastpass-master-secret
 	lastPassUsername := utils.GetEnvOrDie("LASTPASS_USERNAME")
@@ -92,8 +93,8 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	// Fetch the LastPassSecret instance
-	instance := &niqdevv1alpha1.LastPassSecret{}
+	// Fetch the LastPass instance
+	instance := &niqdevv1alpha1.LastPass{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -106,8 +107,8 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	// Request secrets
-	internalSecrets, err := lastpass.RequestSecrets(instance.Spec.ItemRef.Group, instance.Spec.ItemRef.Name)
+	// Request LastPass secrets
+	lastPassSecrets, err := lastpass.RequestSecrets(instance.Spec.SecretRef.Group, instance.Spec.SecretRef.Name)
 	// Logout
 	lastpass.Logout()
 	if err != nil {
@@ -115,11 +116,11 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		return reconcile.Result{}, err
 	}
 
-	for index := range internalSecrets {
-		reqLogger.Info("Verify internal secret", "id", internalSecrets[index].ID)
+	for index := range lastPassSecrets {
+		reqLogger.Info("Verify LastPass secret", "id", lastPassSecrets[index].ID)
 
 		// Define a new Secret object
-		secret := newSecretForCR(instance, internalSecrets[index])
+		secret := newSecretForCR(instance, lastPassSecrets[index])
 
 		// Set LastPassSecret instance as the owner and controller
 		if err := controllerutil.SetControllerReference(instance, secret, r.scheme); err != nil {
@@ -143,13 +144,15 @@ func (r *ReconcileLastPassSecret) Reconcile(request reconcile.Request) (reconcil
 		}
 
 		// Secret already exists - don't requeue
-		reqLogger.Info("Skip reconcile: Secret already exists", "Pod.Namespace", found.Namespace, "Secret.Name", found.Name)
+		reqLogger.Info("Skip reconcile: Secret already exists", "Secret.Namespace", found.Namespace, "Secret.Name", found.Name)
 	}
 
+	// TODO update secret if "last_modified_gmt" or "last_touch" change (?)
 	return reconcile.Result{}, nil
 }
 
-func newSecretForCR(cr *niqdevv1alpha1.LastPassSecret, secret lastpass.InternalSecret) *corev1.Secret {
+// newSecretForCR creates a new secret
+func newSecretForCR(cr *niqdevv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
 	labels := map[string]string{
 		"app": "lastpass-operator",
 	}
@@ -163,16 +166,16 @@ func newSecretForCR(cr *niqdevv1alpha1.LastPassSecret, secret lastpass.InternalS
 	}
 
 	data := map[string]string{}
-	if cr.Spec.ItemRef.WithUsername {
+	if cr.Spec.SecretRef.WithUsername {
 		data["USERNAME"] = secret.Username
 	}
-	if cr.Spec.ItemRef.WithPassword {
+	if cr.Spec.SecretRef.WithPassword {
 		data["PASSWORD"] = secret.Password
 	}
-	if cr.Spec.ItemRef.WithUrl {
+	if cr.Spec.SecretRef.WithUrl {
 		data["URL"] = secret.URL
 	}
-	if cr.Spec.ItemRef.WithNote {
+	if cr.Spec.SecretRef.WithNote {
 		data["NOTE"] = secret.Note
 	}
 

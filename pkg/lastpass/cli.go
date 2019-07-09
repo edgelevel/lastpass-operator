@@ -9,10 +9,10 @@ import (
 	"github.com/codeskyblue/go-sh"
 )
 
-// InternalSecret represents a LastPass secret
+// LastPassSecret represents a LastPass secret
 // For more examples see doc/lpass-example.txt
 // https://mholt.github.io/json-to-go/
-type InternalSecret struct {
+type LastPassSecret struct {
 	ID              string `json:"id"`
 	Name            string `json:"name"`
 	Fullname        string `json:"fullname"`
@@ -57,10 +57,10 @@ func Logout() {
 }
 
 // RequestSecrets returns one or more secrets using lastpass-cli
-func RequestSecrets(group string, name string) ([]InternalSecret, error) {
+func RequestSecrets(group string, name string) ([]LastPassSecret, error) {
 
 	fullName := buildFullName(group, name)
-	secrets := []InternalSecret{}
+	secrets := []LastPassSecret{}
 
 	log.Printf("Request secret: [group=%s][name=%s][fullName=%s]", group, name, fullName)
 
