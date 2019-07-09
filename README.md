@@ -43,7 +43,7 @@ spec:
     enable: true
     refresh: 60
 
-# create custom resource
+# create a custom resource
 $ kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
 ```
 
@@ -96,7 +96,8 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 
 ## Considerations
 
-* The diagram below explains the core logic of the [controller](https://engineering.bitnami.com/articles/a-deep-dive-into-kubernetes-controllers.html)
+* If you want to understand how the operator works, you should have a look at the `Reconcile` function in [lastpass_controller](https://github.com/niqdev/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and the [CustomResourceDefinition](https://github.com/niqdev/lastpass-operator/blob/master/chart/templates/crd.yaml)
+* The diagram below explains the core logic of the [reconcile loop](https://engineering.bitnami.com/articles/a-deep-dive-into-kubernetes-controllers.html)
 
 <p align="center">
   <img src="docs/img/reconcile-loop.png" alt="reconcile-loop">
