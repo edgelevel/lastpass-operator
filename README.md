@@ -109,10 +109,10 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 
 ## Development
 
-* [Setup](doc/setup.md)
-* [golang](doc/golang.md)
-* [operator-sdk](doc/operator.md)
-* [LastPass](doc/lastpass.md)
+* [Setup](docs/setup.md)
+* [golang](docs/golang.md)
+* [operator-sdk](docs/operator.md)
+* [LastPass](docs/lastpass.md)
 
 ```bash
 # download source
