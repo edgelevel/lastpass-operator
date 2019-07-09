@@ -94,6 +94,19 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 {"myKey":"myValue"}
 ```
 
+## Considerations
+
+* The diagram below explains the core logic of the [controller](https://engineering.bitnami.com/articles/a-deep-dive-into-kubernetes-controllers.html)
+
+<p align="center">
+  <img src="docs/img/reconcile-loop.png" alt="reconcile-loop">
+</p>
+
+* The recommended way to install the operator in your cluster is to use the provided Helm [chart](chart/)
+* This operator has been mainly developed to simplify the secrets management for low security environments, if you are a security paranoid you should audit the project and assess if it meets the security standard of your organization
+* The operator, for obvious reasons, won't work if you have MFA enabled on LastPass or your credentials "Require Password Reprompt"
+* Once [this](https://github.com/argoproj/argo-cd/issues/1786) Argo CD feature will be implemented it should allow to bind secrets directly to an `Application`
+
 ## Development
 
 * [Setup](doc/setup.md)
@@ -144,4 +157,5 @@ helm template \
 TODO
 * [ ] fix `lpass` permissions in Dockerfile
 * [ ] fix rules in `rbac.yaml`
-* [ ] version of lastpass-cli
+* [ ] spcify version of lastpass-cli
+* [ ] add license
