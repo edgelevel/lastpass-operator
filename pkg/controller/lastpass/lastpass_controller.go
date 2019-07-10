@@ -2,6 +2,7 @@ package lastpass
 
 import (
 	"context"
+	"time"
 
 	niqdevv1alpha1 "github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1"
 	"github.com/niqdev/lastpass-operator/pkg/lastpass"
@@ -117,23 +118,23 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 	}
 
 	for index := range lastPassSecrets {
-		reqLogger.Info("Verify LastPass secret", "id", lastPassSecrets[index].ID)
 
 		// Define a new Secret object
-		secret := newSecretForCR(instance, lastPassSecrets[index])
+		desired := newSecretForCR(instance, lastPassSecrets[index])
+
+		reqLogger.Info("Verify LastPassSecret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 
 		// Set LastPassSecret instance as the owner and controller
-		if err := controllerutil.SetControllerReference(instance, secret, r.scheme); err != nil {
-			// Interrupt and exit the loop (skip other secrets)
+		if err := controllerutil.SetControllerReference(instance, desired, r.scheme); err != nil {
 			return reconcile.Result{}, err
 		}
 
 		// Check if this Secret already exists
-		found := &corev1.Secret{}
-		err = r.client.Get(context.TODO(), types.NamespacedName{Name: secret.Name, Namespace: secret.Namespace}, found)
+		current := &corev1.Secret{}
+		err = r.client.Get(context.TODO(), types.NamespacedName{Name: desired.Name, Namespace: desired.Namespace}, current)
 		if err != nil && errors.IsNotFound(err) {
-			reqLogger.Info("Creating a new Secret", "Secret.Namespace", secret.Namespace, "Secret.Name", secret.Name)
-			err = r.client.Create(context.TODO(), secret)
+			reqLogger.Info("Creating a new Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
+			err = r.client.Create(context.TODO(), desired)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
@@ -143,11 +144,32 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 			return reconcile.Result{}, err
 		}
 
-		// Secret already exists - don't requeue
-		reqLogger.Info("Skip reconcile: Secret already exists", "Secret.Namespace", found.Namespace, "Secret.Name", found.Name)
+		// Check if this Secret is changed
+		if current.Annotations["lastModifiedGmt"] != desired.Annotations["lastModifiedGmt"] || current.Annotations["lastTouch"] != desired.Annotations["lastTouch"] {
+			reqLogger.Info("Updating Secret",
+				"Secret.Namespace", desired.Namespace,
+				"Secret.Name", desired.Name,
+				"Current:LastModifiedGmt", current.Annotations["lastModifiedGmt"],
+				"Desired:LastModifiedGmt", desired.Annotations["lastModifiedGmt"],
+				"Current:LastTouch", current.Annotations["lastTouch"],
+				"Desired:LastTouch", desired.Annotations["lastTouch"])
+			err = r.client.Update(context.TODO(), desired)
+			if err != nil {
+				return reconcile.Result{}, err
+			}
+			// Secret updated successfully - don't requeue
+			continue
+		}
+
+		reqLogger.Info("Skip reconcile: Secret already exists and is up to date", "Secret.Namespace", current.Namespace, "Secret.Name", current.Name)
 	}
 
-	// TODO update secret if "last_modified_gmt" or "last_touch" change (?)
+	// Periodically reconcile the Custom Resource
+	if instance.Spec.SyncPolicy.Enabled {
+		return reconcile.Result{RequeueAfter: time.Second * instance.Spec.SyncPolicy.Refresh}, nil
+	}
+
+	// Reconcile only if something happens inside the cluster: ignore if the Secret changes externally
 	return reconcile.Result{}, nil
 }
 

@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"time"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -10,10 +12,10 @@ type LastPassSpec struct {
 	// SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	SecretRef SecretRef `json:"secretRef,required"`
+	SecretRef  SecretRef  `json:"secretRef,required"`
+	SyncPolicy SyncPolicy `json:"syncPolicy"`
 }
 
-// SecretRef defines the fields that should be mapped
 type SecretRef struct {
 	Group        string `json:"group,omitempty"`
 	Name         string `json:"name,required"`
@@ -21,6 +23,11 @@ type SecretRef struct {
 	WithPassword bool   `json:"withPassword,omitempty"`
 	WithUrl      bool   `json:"withUrl,omitempty"`
 	WithNote     bool   `json:"withNote,omitempty"`
+}
+
+type SyncPolicy struct {
+	Enabled bool          `json:"enabled,required"`
+	Refresh time.Duration `json:"refresh,required"`
 }
 
 // LastPassStatus defines the observed state of LastPass

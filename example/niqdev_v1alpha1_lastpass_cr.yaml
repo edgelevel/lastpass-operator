@@ -3,6 +3,7 @@ kind: LastPass
 metadata:
   name: example-lastpass
 spec:
+  # required
   secretRef:
     # optional (default "")
     group: example
@@ -16,3 +17,9 @@ spec:
     withUrl: true
     # optional (default false)
     withNote: true
+  # optional
+  syncPolicy:
+    # required (default false)
+    enabled: true
+    # required (in seconds - minimum 10)
+    refresh: 10

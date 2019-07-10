@@ -38,10 +38,9 @@ spec:
     withPassword: true
     withUrl: true
     withNote: true
-  # TODO
   syncPolicy:
-    enable: true
-    refresh: 60
+    enabled: true
+    refresh: 10
 
 # create a custom resource
 $ kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
@@ -176,7 +175,9 @@ ls -la .lpass/
 ```
 
 TODO
-* [ ] implement `syncPolicy` with `return reconcile.Result{RequeueAfter: time.Second*5}, nil`
+* [ ] add logging for every error e.g. `return reconcile.Result{}, err`
+* [ ] review logging of sensible informations
+* [ ] verify optional and required fields
 * [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
 * [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
 * [ ] specify version of lastpass-cli

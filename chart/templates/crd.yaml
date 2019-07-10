@@ -47,3 +47,14 @@ spec:
                   type: boolean
                 withNote:
                   type: boolean
+            syncPolicy:
+              type: object
+              required:
+                - enabled
+                - refresh
+              properties:
+                enabled:
+                  type: boolean
+                refresh:
+                  type: integer
+                  minimum: 10
