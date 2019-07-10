@@ -105,14 +105,14 @@ http :8080/metrics
 
 ## Considerations
 
-* If you want to understand how the operator works, you should have a look at the `Reconcile` function in [lastpass_controller](https://github.com/niqdev/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and the [CustomResourceDefinition](https://github.com/niqdev/lastpass-operator/blob/master/chart/templates/crd.yaml)
+* If you want to understand how the operator works, you should have a look at the `Reconcile` method defined in [lastpass_controller](https://github.com/niqdev/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and at the [CustomResourceDefinition](https://github.com/niqdev/lastpass-operator/blob/master/chart/templates/crd.yaml)
 * The diagram below explains the core logic of the reconcile loop
 
 <p align="center">
   <img src="docs/img/reconcile-loop.png" alt="reconcile-loop">
 </p>
 
-* The recommended way to install the operator in your cluster is to use the provided Helm [chart](chart/)
+* The recommended way to install the operator in your cluster is using the provided Helm [chart](chart/)
 * *TODO for a working example you should have a look at [niqdev/do-k8s](https://github.com/niqdev/do-k8s)*
 * This operator has been mainly developed to simplify the secret management of low security environments, if you are a security paranoid you should audit the project and assess if it meets the security standard of your organization
 * The operator, for obvious reasons, won't work if you have MFA enabled on LastPass or your credentials "Require Password Reprompt"
@@ -181,4 +181,5 @@ TODO
 * [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
 * [ ] specify version of lastpass-cli
 * [ ] add license
+* [ ] publish to dockerhub
 * [ ] add extra metrics
