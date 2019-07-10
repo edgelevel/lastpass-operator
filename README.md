@@ -148,7 +148,6 @@ Run as a Deployment inside the cluster
 make docker-push tag=0.2.0
 
 # apply chart
-kubectl create namespace lastpass
 helm template \
   --values chart/values.yaml \
   --set lastpass.username="myUsername" \
@@ -157,7 +156,10 @@ helm template \
 ```
 
 TODO
-* [ ] fix `lpass` permissions in Dockerfile
-* [ ] fix rules in `rbac.yaml`
-* [ ] spcify version of lastpass-cli
+* [ ] fix/test `lpass` permissions in Dockerfile
+* [ ] publish image and test helm chart
+* [ ] implement `syncPolicy` with `return reconcile.Result{RequeueAfter: time.Second*5}, nil`
+* [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
+* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
+* [ ] specify version of lastpass-cli
 * [ ] add license

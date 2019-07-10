@@ -1,23 +1,24 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lastpass-operator
+  name: {{ .Values.name }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      name: lastpass-operator
+      name: {{ .Values.name }}
   template:
     metadata:
       labels:
-        name: lastpass-operator
+        name: {{ .Values.name }}
     spec:
-      serviceAccountName: lastpass-operator
+      serviceAccountName: {{ .Values.name }}
       containers:
-        - name: lastpass-operator
+        - name: {{ .Values.name }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           command:
-          - lastpass-operator
+          - {{ .Values.name }}
           imagePullPolicy: Always
           env:
             # default
@@ -30,7 +31,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
-              value: "lastpass-operator"
+              value: {{ .Values.name }}
             # custom
             - name: LASTPASS_USERNAME
               valueFrom:

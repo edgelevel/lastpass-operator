@@ -1,13 +1,24 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: lastpass-operator
+  name: {{ .Values.name }}
 rules:
 - apiGroups:
   - ""
   resources:
+  - pods
+  - services
+  - configmaps
   - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - replicasets
   verbs:
   - '*'
 - apiGroups:
@@ -21,17 +32,18 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: lastpass-operator
+  name: {{ .Values.name }}
 
 ---
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: lastpass-operator
+  name: {{ .Values.name }}
 subjects:
   - kind: ServiceAccount
-    name: lastpass-operator
+    name: {{ .Values.name }}
+    namespace: {{ .Values.namespace }}
 roleRef:
-  kind: Role
-  name: lastpass-operator
+  kind: ClusterRole
+  name: {{ .Values.name }}
   apiGroup: rbac.authorization.k8s.io
