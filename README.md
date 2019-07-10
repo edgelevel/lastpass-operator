@@ -94,6 +94,15 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 {"myKey":"myValue"}
 ```
 
+Metrics are exposed by default in Prometheus [format](https://prometheus.io/docs/instrumenting/exposition_formats) similar to [this](example/metrics.txt) example
+```bash
+# port forward
+kubectl port-forward service/lastpass-operator -n lastpass 8080:8383
+
+# request metrics
+http :8080/metrics
+```
+
 ## Considerations
 
 * If you want to understand how the operator works, you should have a look at the `Reconcile` function in [lastpass_controller](https://github.com/niqdev/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and the [CustomResourceDefinition](https://github.com/niqdev/lastpass-operator/blob/master/chart/templates/crd.yaml)
@@ -145,7 +154,7 @@ Run as a Deployment inside the cluster
 ```bash
 # build and publish
 # https://hub.docker.com/repository/docker/niqdev/lastpass-operator
-make docker-push tag=0.3.0
+make docker-push tag=X.Y.Z
 
 # apply chart
 helm template \
@@ -155,9 +164,21 @@ helm template \
   chart/ | kubectl apply -n lastpass -f -
 ```
 
+Debug issues
+```bash
+# verify logs
+kubectl logs deployment/lastpass-operator -n lastpass -f
+
+# access container
+kubectl exec -it lastpass-operator-XXX sh -n lastpass
+lpass --version
+ls -la .lpass/
+```
+
 TODO
 * [ ] implement `syncPolicy` with `return reconcile.Result{RequeueAfter: time.Second*5}, nil`
 * [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
 * [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
 * [ ] specify version of lastpass-cli
 * [ ] add license
+* [ ] add extra metrics
