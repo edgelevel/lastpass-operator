@@ -3,7 +3,7 @@ namespace: lastpass
 
 image:
   repository: niqdev/lastpass-operator
-  tag: 0.2.0
+  tag: 0.3.0
 
 replicas: 1
 

@@ -145,7 +145,7 @@ Run as a Deployment inside the cluster
 ```bash
 # build and publish
 # https://hub.docker.com/repository/docker/niqdev/lastpass-operator
-make docker-push tag=0.2.0
+make docker-push tag=0.3.0
 
 # apply chart
 helm template \
@@ -156,8 +156,6 @@ helm template \
 ```
 
 TODO
-* [ ] fix/test `lpass` permissions in Dockerfile
-* [ ] publish image and test helm chart
 * [ ] implement `syncPolicy` with `return reconcile.Result{RequeueAfter: time.Second*5}, nil`
 * [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
 * [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
