@@ -187,7 +187,7 @@ ls -la .lpass/
 TODO
 * [ ] add logging for every error e.g. `return reconcile.Result{}, err`
 * [ ] review logging of sensible informations
-* [ ] verify optional and required fields
 * [ ] fix version of lastpass-cli and alpine
 * [ ] add license
+* [ ] publish to [OperatorHub](https://operatorhub.io/contribute)
 * [ ] add extra metrics
