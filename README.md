@@ -159,10 +159,6 @@ operator-sdk up local --namespace=default --verbose
 
 Run as a Deployment inside the cluster
 ```bash
-# build and publish manually
-# https://hub.docker.com/u/edgelevel
-make docker-push tag=X.Y.Z docker-password=XYZ
-
 # apply chart
 helm template \
   --values chart/values.yaml \
@@ -180,6 +176,16 @@ kubectl logs deployment/lastpass-operator -n lastpass -f
 kubectl exec -it lastpass-operator-XXX sh -n lastpass
 lpass --version
 ls -la .lpass/
+```
+
+Publish a new version on [DockerHub](https://cloud.docker.com/repository/docker/edgelevel/lastpass-operator)
+```bash
+# build and publish manually (unsafe)
+make docker-push tag=X.Y.Z docker-password=XYZ
+
+# build and publish using travis
+git tag vX.Y.Z
+git push origin --tags
 ```
 
 ---
