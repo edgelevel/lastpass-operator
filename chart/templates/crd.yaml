@@ -57,4 +57,3 @@ spec:
                   type: boolean
                 refresh:
                   type: integer
-                  minimum: 10
