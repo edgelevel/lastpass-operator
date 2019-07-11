@@ -20,6 +20,7 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  script: bash .travis/docker_push.sh $DOCKER_PASSWORD
+  # environment variables defined in travis ui
+  script: bash .travis/docker_push.sh $TRAVIS_TAG $DOCKER_PASSWORD
   on:
     tags: true
