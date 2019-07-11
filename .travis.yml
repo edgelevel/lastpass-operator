@@ -1,8 +1,5 @@
 language: go
 
-env:
-  - OPERATOR_SDK_VERSION=v0.8.1
-
 services:
   - docker
 
@@ -14,12 +11,7 @@ script:
   - make test
 
 before_deploy:
-  # chmod
-  - sudo apt-get install -y coreutils
-  # operator-sdk
-  - curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu && \
-    chmod +x operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu && \
-    sudo mv operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
+  - .travis/install_operator_sdk.sh
 
 deploy:
   provider: script
