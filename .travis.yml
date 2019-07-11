@@ -19,6 +19,7 @@ before_deploy:
 
 deploy:
   provider: script
-  script: bash make docker-push tag=$TRAVIS_TAG docker-password=$DOCKER_PASSWORD
+  skip_cleanup: true
+  script: bash .travis/docker_push.sh $DOCKER_PASSWORD
   on:
     tags: true
