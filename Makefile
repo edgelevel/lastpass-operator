@@ -45,9 +45,6 @@ docker-build: all
 
 .PHONY: docker-login
 docker-login:
-	# prompt
-	#docker login --username $(DOCKER_USERNAME)
-	# without prompt
 	echo ${docker-password} | docker login -u $(DOCKER_USERNAME) --password-stdin
 
 .PHONY: docker-push

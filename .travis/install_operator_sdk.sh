@@ -10,4 +10,7 @@ curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/$
 chmod +x operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
 sudo mv operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk
 
+which operator-sdk
+operator-sdk version
+
 echo "[-] Setup operator-sdk"

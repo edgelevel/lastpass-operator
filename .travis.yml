@@ -4,8 +4,7 @@ services:
   - docker
 
 install:
-  # dep
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - .travis/install_dep.sh
 
 script:
   - make test
@@ -16,7 +15,7 @@ before_deploy:
 deploy:
   provider: script
   skip_cleanup: true
-  # environment variables defined in travis ui
+  # environment variables are defined in travis ui
   script: bash .travis/docker_push.sh $TRAVIS_TAG $DOCKER_PASSWORD
   on:
     tags: true
