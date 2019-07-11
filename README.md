@@ -182,6 +182,8 @@ lpass --version
 ls -la .lpass/
 ```
 
+---
+
 TODO
 * [ ] add logging for every error e.g. `return reconcile.Result{}, err`
 * [ ] review logging of sensible informations

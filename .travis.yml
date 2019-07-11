@@ -10,9 +10,8 @@ install:
   # dep
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
-# default
 script:
-  - make
+  - make test
 
 before_deploy:
   # operator-sdk
