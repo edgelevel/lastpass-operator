@@ -159,9 +159,9 @@ operator-sdk up local --namespace=default --verbose
 
 Run as a Deployment inside the cluster
 ```bash
-# build and publish
+# build and publish manually
 # https://hub.docker.com/u/edgelevel
-make docker-push tag=X.Y.Z
+make docker-push tag=X.Y.Z docker-password=XYZ
 
 # apply chart
 helm template \
@@ -183,11 +183,9 @@ ls -la .lpass/
 ```
 
 TODO
-* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/) with tag deployment on dockerhub
 * [ ] add logging for every error e.g. `return reconcile.Result{}, err`
 * [ ] review logging of sensible informations
 * [ ] verify optional and required fields
 * [ ] fix version of lastpass-cli and alpine
 * [ ] add license
-* [ ] publish to dockerhub
 * [ ] add extra metrics

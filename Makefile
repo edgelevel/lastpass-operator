@@ -15,12 +15,12 @@ requirements:
 ifndef CMD_DOCKER
 	$(error "docker" not found)
 endif
-ifndef CMD_KUBECTL
-	$(error "kubectl" not found)
-endif
-ifndef CMD_HELM
-	$(error "helm" not found)
-endif
+# ifndef CMD_KUBECTL
+# 	$(error "kubectl" not found)
+# endif
+# ifndef CMD_HELM
+# 	$(error "helm" not found)
+# endif
 ifndef CMD_GO
 	$(error "go" not found)
 endif
@@ -45,8 +45,13 @@ docker-build: all
 
 .PHONY: docker-login
 docker-login:
-	docker login --username $(DOCKER_USERNAME)
+	# prompt
+	#docker login --username $(DOCKER_USERNAME)
+	# without prompt
+	echo ${docker-password} | docker login -u $(DOCKER_USERNAME) --password-stdin
 
 .PHONY: docker-push
 docker-push: docker-build docker-login
+	docker tag $(DOCKER_IMAGE):${tag} $(DOCKER_IMAGE):latest
 	docker push $(DOCKER_IMAGE):${tag}
+	docker push $(DOCKER_IMAGE):latest

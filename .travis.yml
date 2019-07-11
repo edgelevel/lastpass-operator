@@ -1,8 +1,25 @@
 language: go
 
+env:
+  - OPERATOR_SDK_VERSION=v0.8.1
+
+services:
+  - docker
+
 install:
   # dep
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
+# default
 script:
-  - make test
+  - make
+
+before_deploy:
+  # operator-sdk
+  - curl -OJL https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
+
+deploy:
+  provider: script
+  script: bash make docker-push tag=$TRAVIS_TAG docker-password=$DOCKER_PASSWORD
+  on:
+    tags: true
