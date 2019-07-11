@@ -98,7 +98,7 @@ $ echo 'eyJteUtleSI6Im15VmFsdWUifQ==' | base64 --decode | jq -c
 {"myKey":"myValue"}
 ```
 
-Metrics are exposed by default in Prometheus [format](https://prometheus.io/docs/instrumenting/exposition_formats) similar to [this](example/metrics.txt) example
+Metrics are exposed by default in Prometheus [format](https://prometheus.io/docs/instrumenting/exposition_formats), see an [example](example/metrics.txt)
 ```bash
 # port forward
 kubectl port-forward service/lastpass-operator -n lastpass 8080:8383
@@ -116,9 +116,9 @@ http :8080/metrics
   <img src="docs/img/reconcile-loop.png" alt="reconcile-loop">
 </p>
 
-* The recommended way to install the operator in your cluster is using the provided Helm [chart](chart/)
+* The recommended way to install the operator in a cluster is by applying the provided Helm [chart](chart/)
 * *TODO for a working example you should have a look at [niqdev/do-k8s](https://github.com/niqdev/do-k8s)*
-* This operator has been mainly developed to simplify the secret management of low security environments, if you are a security paranoid you should audit the project and assess if it meets the security standard of your organization
+* This operator has been mainly developed to simplify the secret management of low security environments, if you are a security paranoid you should audit this project and assess if it meets the security standard of your organization
 * The operator, for obvious reasons, won't work if you have MFA enabled on LastPass or your credentials "Require Password Reprompt"
 * Once [this](https://github.com/argoproj/argo-cd/issues/1786) Argo CD feature will be implemented it should allow to bind secrets directly to an `Application`
 
@@ -180,11 +180,10 @@ ls -la .lpass/
 ```
 
 TODO
-* [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
+* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/) with tag deployment on dockerhub
 * [ ] add logging for every error e.g. `return reconcile.Result{}, err`
 * [ ] review logging of sensible informations
 * [ ] verify optional and required fields
-* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/) with tag deployment on dockerhub
 * [ ] fix version of lastpass-cli and alpine
 * [ ] add license
 * [ ] publish to dockerhub

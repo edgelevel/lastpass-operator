@@ -10,7 +10,7 @@ import (
 )
 
 // LastPassSecret represents a LastPass secret
-// For more examples see doc/lpass-example.txt
+// For more examples see example/lpass-examples.txt
 // https://mholt.github.io/json-to-go/
 type LastPassSecret struct {
 	ID              string `json:"id"`
