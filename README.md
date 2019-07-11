@@ -1,5 +1,10 @@
 # lastpass-operator
 
+[![docker-tag][tag-image]][tag-url]
+
+[tag-image]: https://img.shields.io/github/tag/niqdev/lastpass-operator.svg?style=popout-square&color=e53935
+[tag-url]: https://hub.docker.com/r/niqdev/lastpass-operator
+
 A Kubernetes Operator to manage [secrets](https://kubernetes.io/docs/concepts/configuration/secret) stored in [LastPass](https://www.lastpass.com) password manager
 
 ## How it works
@@ -152,7 +157,7 @@ operator-sdk up local --namespace=default --verbose
 Run as a Deployment inside the cluster
 ```bash
 # build and publish
-# https://hub.docker.com/repository/docker/niqdev/lastpass-operator
+# https://hub.docker.com/u/niqdev
 make docker-push tag=X.Y.Z
 
 # apply chart
@@ -175,12 +180,12 @@ ls -la .lpass/
 ```
 
 TODO
+* [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
 * [ ] add logging for every error e.g. `return reconcile.Result{}, err`
 * [ ] review logging of sensible informations
 * [ ] verify optional and required fields
-* [ ] migrate to edgelevel (delete 2 repos) + DockerHub account
-* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/)
-* [ ] specify version of lastpass-cli
+* [ ] add [travis](https://docs.travis-ci.com/user/languages/go/) with tag deployment on dockerhub
+* [ ] fix version of lastpass-cli and alpine
 * [ ] add license
 * [ ] publish to dockerhub
 * [ ] add extra metrics
