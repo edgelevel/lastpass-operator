@@ -22,10 +22,10 @@ lpass logout --force
 Docker Alpine (8.07MB)
 ```bash
 # build image
-docker build -t niqdev/lastpass-cli -f example/lastpass-alpine .
+docker build -t edgelevel/lastpass-cli -f example/lastpass-alpine .
 
 # temporary container
-docker run --rm -it niqdev/lastpass-cli /bin/sh
+docker run --rm -it edgelevel/lastpass-cli /bin/sh
 echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 echo <PASSWORD> | lpass show <GROUP>/<NAME> --json --expand-multi
 ```
@@ -33,15 +33,15 @@ echo <PASSWORD> | lpass show <GROUP>/<NAME> --json --expand-multi
 Docker Ubuntu (673MB)
 ```bash
 # build image
-docker build -t niqdev/lastpass-cli -f example/lastpass-ubuntu .
+docker build -t edgelevel/lastpass-cli -f example/lastpass-ubuntu .
 
 # temporary container
-docker run --rm --name lastpass-cli niqdev/lastpass-cli
+docker run --rm --name lastpass-cli edgelevel/lastpass-cli
 
 # access container
 docker exec -it lastpass-cli bash
 lpass --version
 
 # execute command inline
-docker run --rm -it niqdev/lastpass-cli lpass --version
+docker run --rm -it edgelevel/lastpass-cli lpass --version
 ```

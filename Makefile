@@ -7,7 +7,7 @@ CMD_GO := $(shell command -v go 2> /dev/null)
 CMD_DEP := $(shell command -v dep 2> /dev/null)
 CMD_OPERATOR_SDK := $(shell command -v operator-sdk 2> /dev/null)
 
-DOCKER_USERNAME := niqdev
+DOCKER_USERNAME := edgelevel
 DOCKER_IMAGE := $(DOCKER_USERNAME)/lastpass-operator
 
 .PHONY: requirements

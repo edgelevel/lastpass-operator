@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	niqdevv1alpha1 "github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1"
-	"github.com/niqdev/lastpass-operator/pkg/lastpass"
-	"github.com/niqdev/lastpass-operator/pkg/utils"
+	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1"
+	"github.com/edgelevel/lastpass-operator/pkg/lastpass"
+	"github.com/edgelevel/lastpass-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,7 +44,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource LastPass
-	err = c.Watch(&source.Kind{Type: &niqdevv1alpha1.LastPass{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &edgelevelv1alpha1.LastPass{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource Secrets and requeue the owner LastPass
 	err = c.Watch(&source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &niqdevv1alpha1.LastPass{},
+		OwnerType:    &edgelevelv1alpha1.LastPass{},
 	})
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 	}
 
 	// Fetch the LastPass instance
-	instance := &niqdevv1alpha1.LastPass{}
+	instance := &edgelevelv1alpha1.LastPass{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -174,7 +174,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 }
 
 // newSecretForCR creates a new secret
-func newSecretForCR(cr *niqdevv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
+func newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
 	labels := map[string]string{
 		"app": "lastpass-operator",
 	}

@@ -2,7 +2,7 @@ name: lastpass-operator
 namespace: lastpass
 
 image:
-  repository: niqdev/lastpass-operator
+  repository: edgelevel/lastpass-operator
   tag: 0.4.0
 
 replicas: 1

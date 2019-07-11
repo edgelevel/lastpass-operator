@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1"
+	"github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1"
 )
 
 func init() {

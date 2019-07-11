@@ -13,13 +13,13 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPass":       schema_pkg_apis_niqdev_v1alpha1_LastPass(ref),
-		"github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassSpec":   schema_pkg_apis_niqdev_v1alpha1_LastPassSpec(ref),
-		"github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassStatus": schema_pkg_apis_niqdev_v1alpha1_LastPassStatus(ref),
+		"github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPass":       schema_pkg_apis_edgelevel_v1alpha1_LastPass(ref),
+		"github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassSpec":   schema_pkg_apis_edgelevel_v1alpha1_LastPassSpec(ref),
+		"github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassStatus": schema_pkg_apis_edgelevel_v1alpha1_LastPassStatus(ref),
 	}
 }
 
-func schema_pkg_apis_niqdev_v1alpha1_LastPass(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_edgelevel_v1alpha1_LastPass(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -46,23 +46,23 @@ func schema_pkg_apis_niqdev_v1alpha1_LastPass(ref common.ReferenceCallback) comm
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassSpec"),
+							Ref: ref("github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassStatus"),
+							Ref: ref("github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassSpec", "github.com/niqdev/lastpass-operator/pkg/apis/niqdev/v1alpha1.LastPassStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassSpec", "github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1.LastPassStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_niqdev_v1alpha1_LastPassSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_edgelevel_v1alpha1_LastPassSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -74,7 +74,7 @@ func schema_pkg_apis_niqdev_v1alpha1_LastPassSpec(ref common.ReferenceCallback) 
 	}
 }
 
-func schema_pkg_apis_niqdev_v1alpha1_LastPassStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_edgelevel_v1alpha1_LastPassStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{

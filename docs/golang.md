@@ -6,8 +6,8 @@
 
 ```bash
 # download source
-mkdir -p $GOPATH/src/github.com/niqdev && cd $_
-git clone git@github.com:niqdev/lastpass-operator.git
+mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
+git clone git@github.com:edgelevel/lastpass-operator.git
 
 # first time only
 dep init
@@ -33,11 +33,11 @@ cobra init . --pkg-name lastpass-operator
 go run main.go
 
 # compile
-go build $GOPATH/src/github.com/niqdev/lastpass-operator
+go build $GOPATH/src/github.com/edgelevel/lastpass-operator
 
 # compile and build executable
-go install $GOPATH/src/github.com/niqdev/lastpass-operator
+go install $GOPATH/src/github.com/edgelevel/lastpass-operator
 
 # test
-go test $GOPATH/src/github.com/niqdev/lastpass-operator
+go test $GOPATH/src/github.com/edgelevel/lastpass-operator
 ```

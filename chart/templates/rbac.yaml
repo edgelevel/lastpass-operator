@@ -22,7 +22,7 @@ rules:
   verbs:
   - '*'
 - apiGroups:
-  - niqdev.com
+  - edgelevel.com
   resources:
   - '*'
   verbs:

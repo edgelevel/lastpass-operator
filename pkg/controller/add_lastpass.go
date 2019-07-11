@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/niqdev/lastpass-operator/pkg/controller/lastpass"
+	"github.com/edgelevel/lastpass-operator/pkg/controller/lastpass"
 )
 
 func init() {

@@ -1,4 +1,4 @@
-apiVersion: niqdev.com/v1alpha1
+apiVersion: edgelevel.com/v1alpha1
 kind: LastPass
 metadata:
   name: example-lastpass

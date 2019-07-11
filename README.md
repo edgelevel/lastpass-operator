@@ -2,8 +2,8 @@
 
 [![docker-tag][tag-image]][tag-url]
 
-[tag-image]: https://img.shields.io/github/tag/niqdev/lastpass-operator.svg?style=popout-square&color=e53935
-[tag-url]: https://hub.docker.com/r/niqdev/lastpass-operator
+[tag-image]: https://img.shields.io/github/tag/edgelevel/lastpass-operator.svg?style=popout-square&color=e53935
+[tag-url]: https://hub.docker.com/r/edgelevel/lastpass-operator
 
 A Kubernetes Operator to manage [secrets](https://kubernetes.io/docs/concepts/configuration/secret) stored in [LastPass](https://www.lastpass.com) password manager
 
@@ -30,8 +30,8 @@ $ lpass show example/my-secret --json
 
 Define a `LastPass` [Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources) to automatically manage the lifecycle of your secrets in Kubernetes
 ```bash
-$ cat example/niqdev_v1alpha1_lastpass_cr.yaml
-apiVersion: niqdev.com/v1alpha1
+$ cat example/edgelevel_v1alpha1_lastpass_cr.yaml
+apiVersion: edgelevel.com/v1alpha1
 kind: LastPass
 metadata:
   name: example-lastpass
@@ -48,7 +48,7 @@ spec:
     refresh: 10
 
 # create a custom resource
-$ kubectl apply -f example/niqdev_v1alpha1_lastpass_cr.yaml
+$ kubectl apply -f example/edgelevel_v1alpha1_lastpass_cr.yaml
 ```
 
 The operator will take care of create native Kubernetes secrets and keep them up to date that if they change
@@ -80,7 +80,7 @@ metadata:
   name: example-lastpass-8190226423897406876
   namespace: default
   ownerReferences:
-  - apiVersion: niqdev.com/v1alpha1
+  - apiVersion: edgelevel.com/v1alpha1
     blockOwnerDeletion: true
     controller: true
     kind: LastPass
@@ -109,7 +109,7 @@ http :8080/metrics
 
 ## Considerations
 
-* If you want to understand how the operator works, you should have a look at the `Reconcile` method defined in [lastpass_controller](https://github.com/niqdev/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and at the [CustomResourceDefinition](https://github.com/niqdev/lastpass-operator/blob/master/chart/templates/crd.yaml)
+* If you want to understand how the operator works, you should have a look at the `Reconcile` method defined in [lastpass_controller](https://github.com/edgelevel/lastpass-operator/blob/master/pkg/controller/lastpass/lastpass_controller.go) and at the [CustomResourceDefinition](https://github.com/edgelevel/lastpass-operator/blob/master/chart/templates/crd.yaml)
 * The diagram below explains the core logic of the reconcile loop
 
 <p align="center">
@@ -131,8 +131,8 @@ http :8080/metrics
 
 ```bash
 # download source
-mkdir -p $GOPATH/src/github.com/niqdev && cd $_
-git clone git@github.com:niqdev/lastpass-operator.git
+mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
+git clone git@github.com:edgelevel/lastpass-operator.git
 cd lastpass-operator
 
 # install dependencies
@@ -157,7 +157,7 @@ operator-sdk up local --namespace=default --verbose
 Run as a Deployment inside the cluster
 ```bash
 # build and publish
-# https://hub.docker.com/u/niqdev
+# https://hub.docker.com/u/edgelevel
 make docker-push tag=X.Y.Z
 
 # apply chart

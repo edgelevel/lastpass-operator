@@ -19,13 +19,13 @@ export PATH=$PATH:$(go env GOPATH)/bin
 Initialize project
 ```bash
 # create project
-mkdir -p $GOPATH/src/github.com/niqdev && cd $_
+mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
 operator-sdk new lastpass-operator --dep-manager=dep
 
 # add crd
-operator-sdk add api --api-version=niqdev.com/v1alpha1 --kind=LastPass
+operator-sdk add api --api-version=edgelevel.com/v1alpha1 --kind=LastPass
 operator-sdk generate k8s
 
 # add controller
-operator-sdk add controller --api-version=niqdev.com/v1alpha1 --kind=LastPass
+operator-sdk add controller --api-version=edgelevel.com/v1alpha1 --kind=LastPass
 ```
