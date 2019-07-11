@@ -1,4 +1,8 @@
 language: go
 
+install:
+  # dep
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
 script:
   - make test
