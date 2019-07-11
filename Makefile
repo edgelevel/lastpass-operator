@@ -31,12 +31,16 @@ ifndef CMD_OPERATOR_SDK
 	$(error "operator-sdk" not found)
 endif
 
+.PHONY: test
+test:
+	dep ensure
+	go test -v ./...
+
 .PHONY: all
-all: requirements
+all: requirements test
 
 .PHONY: docker-build
-docker-build: requirements
-	dep ensure
+docker-build: all
 	operator-sdk build $(DOCKER_IMAGE):${tag}
 
 .PHONY: docker-login
