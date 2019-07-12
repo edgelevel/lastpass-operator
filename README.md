@@ -191,6 +191,5 @@ git push origin --tags
 ---
 
 TODO
-* [ ] fix version of lastpass-cli and alpine
+* [ ] add extra Prometheus [metrics](https://prometheus.io/docs/guides/go-application)
 * [ ] publish to [OperatorHub](https://operatorhub.io/contribute)
-* [ ] add extra metrics

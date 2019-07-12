@@ -1,12 +1,13 @@
-FROM alpine:latest
+FROM alpine:3.10.1
 
 ENV OPERATOR=/usr/local/bin/lastpass-operator \
     USER_UID=1001 \
-    USER_NAME=lastpass-operator
+    USER_NAME=lastpass-operator \
+    LASTPASS_VERSION=1.3.3-r0
 
 # https://github.com/lastpass/lastpass-cli
 RUN apk add --update --no-cache \
-  lastpass-cli && \
+  lastpass-cli==${LASTPASS_VERSION} && \
   rm -f /var/cache/apk/*
 
 RUN install -d -m 0755 -o ${USER_UID} -g ${USER_UID} .lpass

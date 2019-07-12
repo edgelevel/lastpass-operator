@@ -21,6 +21,9 @@ lpass logout --force
 
 Docker Alpine (8.07MB)
 ```bash
+# temporary base container
+docker run --rm -it alpine /bin/sh
+
 # build image
 docker build -t edgelevel/lastpass-cli -f example/lastpass-alpine .
 
