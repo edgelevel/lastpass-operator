@@ -126,6 +126,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 
 		// Set LastPassSecret instance as the owner and controller
 		if err := controllerutil.SetControllerReference(instance, desired, r.scheme); err != nil {
+			reqLogger.Error(err, "Failed to set LastPassSecret instance as the owner and controller")
 			return reconcile.Result{}, err
 		}
 
@@ -133,14 +134,16 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 		current := &corev1.Secret{}
 		err = r.client.Get(context.TODO(), types.NamespacedName{Name: desired.Name, Namespace: desired.Namespace}, current)
 		if err != nil && errors.IsNotFound(err) {
-			reqLogger.Info("Creating a new Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
+			reqLogger.Info("Creating Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 			err = r.client.Create(context.TODO(), desired)
 			if err != nil {
+				reqLogger.Error(err, "Failed to create Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 				return reconcile.Result{}, err
 			}
 			// Secret created successfully - don't requeue
 			continue
 		} else if err != nil {
+			reqLogger.Error(err, "Failed to get Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 			return reconcile.Result{}, err
 		}
 
@@ -155,6 +158,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 				"Desired:LastTouch", desired.Annotations["lastTouch"])
 			err = r.client.Update(context.TODO(), desired)
 			if err != nil {
+				reqLogger.Error(err, "Failed to update Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 				return reconcile.Result{}, err
 			}
 			// Secret updated successfully - don't requeue

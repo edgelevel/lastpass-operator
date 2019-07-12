@@ -29,18 +29,18 @@ type LastPassSecret struct {
 func VerifyCliExistsOrDie() {
 	out, err := sh.Command("which", "lpass").Output()
 	if err != nil || "" == string(out) {
-		panic("lpass binary not found")
+		panic(fmt.Sprintf("lpass binary not found: [%s]", err))
 	}
 	log.Printf("lpass binary found")
 }
 
-// Login attempts to login using lastpass-cli
+// Login using lastpass-cli
 func Login(username string, password string) error {
 	// echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 	out, err := sh.NewSession().SetEnv("LPASS_DISABLE_PINENTRY", "1").Command("echo", password).Command("lpass", "login", "--trust", username).Output()
 	if err != nil || "" == string(out) {
 		// sometimes returns error: "Error: HTTP response code said error" even if the credentials are valid
-		return fmt.Errorf("unable to login: verify credentials - %s", err)
+		return fmt.Errorf("verify credentials, unable to login: %s", err)
 	}
 	log.Printf("Succesfully logged in")
 	return nil
@@ -62,16 +62,16 @@ func RequestSecrets(group string, name string) ([]LastPassSecret, error) {
 	fullName := buildFullName(group, name)
 	secrets := []LastPassSecret{}
 
-	log.Printf("Request secret: [group=%s][name=%s][fullName=%s]", group, name, fullName)
+	log.Printf("Request secrets: [%s]", fullName)
 
 	// lpass show <GROUP>/<NAME> --json --expand-multi
 	out, err := sh.Command("lpass", "show", fullName, "--json", "--expand-multi").Output()
 	if err != nil {
-		return secrets, fmt.Errorf("invalid secret: [%s] - %s", fullName, err)
+		return secrets, fmt.Errorf("invalid secrets: [%s] - %s", fullName, err)
 	}
 
-	// TODO print in debug only
-	log.Printf("Secret response: %s", out)
+	// uncomment for debug
+	//log.Printf("Secret response: %s", out)
 
 	// decode JSON structure into Go structure
 	jsonErr := json.Unmarshal([]byte(out), &secrets)
