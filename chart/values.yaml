@@ -3,7 +3,7 @@ namespace: lastpass
 
 image:
   repository: edgelevel/lastpass-operator
-  tag: v0.6.1
+  tag: latest
 
 replicas: 1
 
