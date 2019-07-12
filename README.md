@@ -192,6 +192,5 @@ git push origin --tags
 
 TODO
 * [ ] fix version of lastpass-cli and alpine
-* [ ] add license
 * [ ] publish to [OperatorHub](https://operatorhub.io/contribute)
 * [ ] add extra metrics
