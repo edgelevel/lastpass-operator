@@ -178,7 +178,7 @@ lpass --version
 ls -la .lpass/
 ```
 
-Publish a new version on [DockerHub](https://cloud.docker.com/repository/docker/edgelevel/lastpass-operator)
+Publish a new version on [DockerHub](https://hub.docker.com/r/edgelevel/lastpass-operator)
 ```bash
 # build and publish manually (unsafe)
 make docker-push tag=X.Y.Z docker-password=XYZ
