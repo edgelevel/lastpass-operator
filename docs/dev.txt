@@ -7,3 +7,4 @@ https://github.com/acamillo/aws-secret-operator
 https://github.com/cmattoon/aws-ssm
 https://github.com/shyiko/kubesec
 https://github.com/Boostport/kubernetes-vault
+https://github.com/contentful-labs/kube-secret-syncer
