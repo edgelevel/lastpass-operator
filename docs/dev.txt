@@ -8,3 +8,4 @@ https://github.com/cmattoon/aws-ssm
 https://github.com/shyiko/kubesec
 https://github.com/Boostport/kubernetes-vault
 https://github.com/contentful-labs/kube-secret-syncer
+https://itnext.io/argocd-secret-management-with-argocd-vault-plugin-539f104aff05
