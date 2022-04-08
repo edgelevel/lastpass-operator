@@ -53,7 +53,7 @@ func Login(username string, password string) error {
 // Logout using lastpass-cli
 func Logout() {
 	// logout is not relevant in operator context.
-        log.Printf("Should logged out, but doing nothing")
+        log.Printf("Should log out, but doing nothing")
 }
 
 // RequestSecrets returns one or more secrets using lastpass-cli
