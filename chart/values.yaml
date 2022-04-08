@@ -1,8 +1,7 @@
 name: lastpass-operator
-namespace: lastpass
 
 image:
-  repository: edgelevel/lastpass-operator
+  repository: enix/lastpass-operator
   tag: latest
 
 replicas: 1
