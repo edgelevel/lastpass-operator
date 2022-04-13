@@ -33,7 +33,7 @@ endif
 
 .PHONY: test
 test:
-	dep ensure
+	go mod download -x
 	go test -v ./...
 
 .PHONY: all

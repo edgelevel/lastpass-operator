@@ -3,9 +3,6 @@ language: go
 services:
   - docker
 
-install:
-  - .travis/install_dep.sh
-
 script:
   - make test
 
