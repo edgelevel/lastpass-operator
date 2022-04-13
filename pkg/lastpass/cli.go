@@ -36,7 +36,7 @@ func VerifyCliExistsOrDie() {
 
 // Login using lastpass-cli
 func Login(username string, password string) error {
-        _, err := sh.Command("lpass", "status").Output()
+	_, err := sh.Command("lpass", "status").Output()
 	log.Printf("Checking if already logged in")
 	if err != nil {
 		log.Printf("Doing login")
@@ -53,7 +53,7 @@ func Login(username string, password string) error {
 // Logout using lastpass-cli
 func Logout() {
 	// logout is not relevant in operator context.
-        log.Printf("Should log out, but doing nothing")
+	log.Printf("Should log out, but doing nothing")
 }
 
 // RequestSecrets returns one or more secrets using lastpass-cli
