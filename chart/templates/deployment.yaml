@@ -17,15 +17,7 @@ spec:
       containers:
         - name: {{ .Values.name }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
-          command:
-          - {{ .Values.name }}
           imagePullPolicy: Always
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8686
-            initialDelaySeconds: 5
-            periodSeconds: 3
           env:
             # default
             - name: WATCH_NAMESPACE
