@@ -43,12 +43,8 @@ all: requirements test
 docker-build: all
 	operator-sdk build $(DOCKER_IMAGE):${tag}
 
-.PHONY: docker-login
-docker-login:
-	echo ${docker-password} | docker login -u $(DOCKER_USERNAME) --password-stdin
-
 .PHONY: docker-push
-docker-push: docker-build docker-login
+docker-push: docker-build
 	docker tag $(DOCKER_IMAGE):${tag} $(DOCKER_IMAGE):latest
 	docker push $(DOCKER_IMAGE):${tag}
 	docker push $(DOCKER_IMAGE):latest
