@@ -8,6 +8,7 @@ import (
 
 // LastPassSpec defines the desired state of LastPass
 // +k8s:openapi-gen=true
+// +kubebuilder:resource:path=lastpass,scope=Namespaced
 type LastPassSpec struct {
 	// SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file

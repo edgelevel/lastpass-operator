@@ -2,7 +2,7 @@
 
 # see https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md
 
-export OPERATOR_SDK_VERSION=v0.8.2
+export OPERATOR_SDK_VERSION=v0.17.2
 
 echo "[+] Setup operator-sdk"
 
