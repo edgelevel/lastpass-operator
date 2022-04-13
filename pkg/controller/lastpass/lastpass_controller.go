@@ -207,7 +207,7 @@ func newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecr
 
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        cr.Name + "-" + secret.ID,
+			Name:        cr.Name,
 			Namespace:   cr.Namespace,
 			Labels:      labels,
 			Annotations: annotations,
