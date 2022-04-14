@@ -33,7 +33,7 @@ type LastPassSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	SecretRef  SecretRef  `json:"secretRef,required"`
-	SyncPolicy SyncPolicy `json:"syncPolicy"`
+	SyncPolicy SyncPolicy `json:"syncPolicy,omitempty"`
 }
 
 type SecretRef struct {
