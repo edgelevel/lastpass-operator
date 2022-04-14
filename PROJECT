@@ -5,7 +5,7 @@ plugins:
 repo: github.com/edgelevel/lastpass-operator
 resources:
 - api:
-    crdVersion: v1beta1
+    crdVersion: v1
     namespaced: true
   controller: true
   domain: edgelevel.com
