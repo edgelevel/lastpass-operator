@@ -141,8 +141,11 @@ mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
 git clone git@github.com:edgelevel/lastpass-operator.git
 cd lastpass-operator
 
+# install operator-sdk
+.travis/install_operator_sdk.sh
+
 # install dependencies
-dep ensure
+go mod download -x
 ```
 
 Run locally outside the cluster on [minkube](https://github.com/kubernetes/minikube)
@@ -174,17 +177,13 @@ Debug issues
 ```bash
 # verify logs
 kubectl logs deployment/lastpass-operator -n lastpass -f
-
-# access container
-kubectl exec -it lastpass-operator-XXX sh -n lastpass
-lpass --version
-ls -la .lpass/
 ```
 
 Publish a new version on [DockerHub](https://hub.docker.com/r/edgelevel/lastpass-operator)
 ```bash
 # build and publish manually (unsafe)
-make docker-push tag=X.Y.Z docker-password=XYZ
+make docker-build IMG=edgelevel/lastpass-operator:X.Y.Z
+make docker-push IMG=edgelevel/lastpass-operator:X.Y.Z
 
 # build and publish using travis
 git tag vX.Y.Z

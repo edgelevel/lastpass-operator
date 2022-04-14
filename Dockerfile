@@ -29,18 +29,22 @@ RUN apt update && apt install -y \
   lastpass-cli=${LASTPASS_VERSION} \
   && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /usr/lib/lastpass-cli \
+&& ldd /usr/bin/lpass | grep '=>' | awk '{ print $3 }' | xargs cp -t /usr/lib/lastpass-cli
+
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/base:nonroot
 
 ENV USER_UID=1001 \
     USER_NAME=lastpass-operator
 
-# RUN install -d -m 0755 -o ${USER_UID} -g ${USER_UID} .lpass
-
 WORKDIR /
 COPY --from=builder /workspace/manager .
-COPY --from=lastpass-cli /usr/bin/lpass /usr/bin/lpass
+COPY --from=lastpass-cli /usr/bin/lpass /usr/bin/which /usr/bin/
+COPY --from=lastpass-cli /usr/lib/lastpass-cli /lib
+COPY --from=lastpass-cli /bin/sh /bin/echo /bin/
+
 USER nonroot:nonroot
 
 ENTRYPOINT ["/manager"]
