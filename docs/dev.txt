@@ -2,6 +2,7 @@ https://github.com/entretechno/lastpass-api
 https://github.com/konomae/lastpass-python
 
 https://godaddy.github.io/2019/04/16/kubernetes-external-secrets
+https://external-secrets.io
 https://github.com/mumoshu/aws-secret-operator
 https://github.com/acamillo/aws-secret-operator
 https://github.com/cmattoon/aws-ssm
@@ -9,3 +10,4 @@ https://github.com/shyiko/kubesec
 https://github.com/Boostport/kubernetes-vault
 https://github.com/contentful-labs/kube-secret-syncer
 https://itnext.io/argocd-secret-management-with-argocd-vault-plugin-539f104aff05
+https://developer.1password.com/docs/connect/helm
