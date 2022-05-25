@@ -9,3 +9,5 @@ replicas: 1
 lastpass:
   username: ""
   password: ""
+
+secretNameTemplate: ""

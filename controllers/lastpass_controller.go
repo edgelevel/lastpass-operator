@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bytes"
 	"context"
+	"text/template"
 	"time"
 
 	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
@@ -25,8 +27,9 @@ var log = logf.Log.WithName("controller_lastpass")
 // LastPassReconciler reconciles a LastPass object
 type LastPassReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log                logr.Logger
+	Scheme             *runtime.Scheme
+	SecretNameTemplate *template.Template
 }
 
 //+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses,verbs=get;list;watch;create;update;patch;delete
@@ -84,7 +87,7 @@ func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	for index := range lastPassSecrets {
 
 		// Define a new Secret object
-		desired := newSecretForCR(instance, lastPassSecrets[index])
+		desired := r.newSecretForCR(instance, lastPassSecrets[index])
 
 		reqLogger.Info("Verify LastPassSecret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 
@@ -149,7 +152,7 @@ func (r *LastPassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // newSecretForCR creates a new secret
-func newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
+func (r *LastPassReconciler) newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
 	labels := map[string]string{
 		"app": "lastpass-operator",
 	}
@@ -176,9 +179,15 @@ func newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecr
 		data["NOTE"] = secret.Note
 	}
 
+	var secretName bytes.Buffer
+	r.SecretNameTemplate.Execute(&secretName, struct {
+		LastPass       *edgelevelv1alpha1.LastPass
+		LastPassSecret lastpass.LastPassSecret
+	}{cr, secret})
+
 	return &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        cr.Name,
+			Name:        secretName.String(),
 			Namespace:   cr.Namespace,
 			Labels:      labels,
 			Annotations: annotations,

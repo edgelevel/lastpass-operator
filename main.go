@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	goruntime "runtime"
+	"text/template"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -40,8 +41,10 @@ func printVersion() {
 
 func main() {
 	var metricsAddr string
+	var secretNameTemplateStr string
 	var enableLeaderElection bool
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&secretNameTemplateStr, "secret-name-template", "{{.LastPass.ObjectMeta.Name}}-{{.LastPassSecret.ID}}", "The go template to generate secrets name from LastPass and LastPassSecret objects.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -63,10 +66,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	secretNameTemplate, err := template.New("secretName").Parse(secretNameTemplateStr)
+	if err != nil {
+		panic(err)
+	}
+
 	if err = (&controllers.LastPassReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("LastPass"),
-		Scheme: mgr.GetScheme(),
+		Client:             mgr.GetClient(),
+		Log:                ctrl.Log.WithName("controllers").WithName("LastPass"),
+		Scheme:             mgr.GetScheme(),
+		SecretNameTemplate: secretNameTemplate,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LastPass")
 		os.Exit(1)
