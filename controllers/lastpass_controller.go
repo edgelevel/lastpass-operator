@@ -1,84 +1,48 @@
-package lastpass
+package controllers
 
 import (
 	"context"
 	"time"
 
-	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/pkg/apis/edgelevel/v1alpha1"
+	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
 	"github.com/edgelevel/lastpass-operator/pkg/lastpass"
 	"github.com/edgelevel/lastpass-operator/pkg/utils"
+	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 var log = logf.Log.WithName("controller_lastpass")
 
-// Add creates a new LastPass Controller and adds it to the Manager. The Manager will set fields on the Controller
-// and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
+// LastPassReconciler reconciles a LastPass object
+type LastPassReconciler struct {
+	client.Client
+	Log    logr.Logger
+	Scheme *runtime.Scheme
 }
 
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileLastPass{client: mgr.GetClient(), scheme: mgr.GetScheme()}
-}
+//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses/status,verbs=get;update;patch
 
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
-	// Create a new controller
-	c, err := controller.New("lastpass-controller", mgr, controller.Options{Reconciler: r})
-	if err != nil {
-		return err
-	}
-
-	// Watch for changes to primary resource LastPass
-	err = c.Watch(&source.Kind{Type: &edgelevelv1alpha1.LastPass{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
-		return err
-	}
-
-	// Watch for changes to secondary resource Secrets and requeue the owner LastPass
-	err = c.Watch(&source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &edgelevelv1alpha1.LastPass{},
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// blank assignment to verify that ReconcileLastPass implements reconcile.Reconciler
-var _ reconcile.Reconciler = &ReconcileLastPass{}
-
-// ReconcileLastPass reconciles a LastPass object
-type ReconcileLastPass struct {
-	// This client, initialized using mgr.Client() above, is a split client
-	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
-}
-
-// Reconcile reads that state of the cluster for a LastPass object and makes changes based on the state read
-// and what is in the LastPass.Spec
-// Note:
-// The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+// Reconcile is part of the main kubernetes reconciliation loop which aims to
+// move the current state of the cluster closer to the desired state.
+// TODO(user): Modify the Reconcile function to compare the state specified by
+// the LastPass object against the actual cluster state, and then
+// perform operations to make the cluster state reflect the state specified by
+// the user.
+//
+// For more details, check Reconcile and its Result here:
+// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.6.4/pkg/reconcile
+func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling LastPass")
 
 	// Check that the environment variables are defined or exit. See also lastpass-master-secret
@@ -96,7 +60,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 
 	// Fetch the LastPass instance
 	instance := &edgelevelv1alpha1.LastPass{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -125,17 +89,17 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 		reqLogger.Info("Verify LastPassSecret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 
 		// Set LastPassSecret instance as the owner and controller
-		if err := controllerutil.SetControllerReference(instance, desired, r.scheme); err != nil {
+		if err := controllerutil.SetControllerReference(instance, desired, r.Scheme); err != nil {
 			reqLogger.Error(err, "Failed to set LastPassSecret instance as the owner and controller")
 			return reconcile.Result{}, err
 		}
 
 		// Check if this Secret already exists
 		current := &corev1.Secret{}
-		err = r.client.Get(context.TODO(), types.NamespacedName{Name: desired.Name, Namespace: desired.Namespace}, current)
+		err = r.Client.Get(context.TODO(), types.NamespacedName{Name: desired.Name, Namespace: desired.Namespace}, current)
 		if err != nil && errors.IsNotFound(err) {
 			reqLogger.Info("Creating Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
-			err = r.client.Create(context.TODO(), desired)
+			err = r.Client.Create(context.TODO(), desired)
 			if err != nil {
 				reqLogger.Error(err, "Failed to create Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 				return reconcile.Result{}, err
@@ -156,7 +120,7 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 				"Desired:LastModifiedGmt", desired.Annotations["lastModifiedGmt"],
 				"Current:LastTouch", current.Annotations["lastTouch"],
 				"Desired:LastTouch", desired.Annotations["lastTouch"])
-			err = r.client.Update(context.TODO(), desired)
+			err = r.Client.Update(context.TODO(), desired)
 			if err != nil {
 				reqLogger.Error(err, "Failed to update Secret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 				return reconcile.Result{}, err
@@ -175,6 +139,13 @@ func (r *ReconcileLastPass) Reconcile(request reconcile.Request) (reconcile.Resu
 
 	// Reconcile only if something happens inside the cluster: ignore if the Secret changes externally
 	return reconcile.Result{}, nil
+}
+
+// SetupWithManager sets up the controller with the Manager.
+func (r *LastPassReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&edgelevelv1alpha1.LastPass{}).
+		Complete(r)
 }
 
 // newSecretForCR creates a new secret

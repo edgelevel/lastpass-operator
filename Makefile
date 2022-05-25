@@ -1,54 +1,118 @@
-.DEFAULT_GOAL := all
-
-CMD_DOCKER := $(shell command -v docker 2> /dev/null)
-CMD_KUBECTL := $(shell command -v kubectl 2> /dev/null)
-CMD_HELM := $(shell command -v helm 2> /dev/null)
-CMD_GO := $(shell command -v go 2> /dev/null)
-CMD_DEP := $(shell command -v dep 2> /dev/null)
-CMD_OPERATOR_SDK := $(shell command -v operator-sdk 2> /dev/null)
-
-DOCKER_USERNAME := edgelevel
-DOCKER_IMAGE := $(DOCKER_USERNAME)/lastpass-operator
-
-.PHONY: requirements
-requirements:
-ifndef CMD_DOCKER
-	$(error "docker" not found)
+# Current Operator version
+VERSION ?= 0.0.1
+# Default bundle image tag
+BUNDLE_IMG ?= controller-bundle:$(VERSION)
+# Options for 'bundle-build'
+ifneq ($(origin CHANNELS), undefined)
+BUNDLE_CHANNELS := --channels=$(CHANNELS)
 endif
-# ifndef CMD_KUBECTL
-# 	$(error "kubectl" not found)
-# endif
-# ifndef CMD_HELM
-# 	$(error "helm" not found)
-# endif
-ifndef CMD_GO
-	$(error "go" not found)
+ifneq ($(origin DEFAULT_CHANNEL), undefined)
+BUNDLE_DEFAULT_CHANNEL := --default-channel=$(DEFAULT_CHANNEL)
 endif
-ifndef CMD_DEP
-	$(error "dep" not found)
-endif
-ifndef CMD_OPERATOR_SDK
-	$(error "operator-sdk" not found)
+BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
+
+# Image URL to use all building/pushing image targets
+IMG ?= controller:latest
+# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
+CRD_OPTIONS ?= "crd:trivialVersions=true"
+
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
 endif
 
-.PHONY: test
-test:
-	dep ensure
-	go test -v ./...
+all: manager
 
-.PHONY: all
-all: requirements test
+# Run tests
+test: generate fmt vet manifests
+	go test ./... -coverprofile cover.out
 
-.PHONY: docker-build
-docker-build: all
-	operator-sdk build $(DOCKER_IMAGE):${tag}
+# Build manager binary
+manager: generate fmt vet
+	go build -o bin/manager main.go
 
-.PHONY: docker-login
-docker-login:
-	echo ${docker-password} | docker login -u $(DOCKER_USERNAME) --password-stdin
+# Run against the configured Kubernetes cluster in ~/.kube/config
+run: generate fmt vet manifests
+	go run ./main.go
 
-.PHONY: docker-push
-docker-push: docker-build docker-login
-	docker tag $(DOCKER_IMAGE):${tag} $(DOCKER_IMAGE):latest
-	docker push $(DOCKER_IMAGE):${tag}
-	docker push $(DOCKER_IMAGE):latest
+# Install CRDs into a cluster
+install: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl apply -f -
+
+# Uninstall CRDs from a cluster
+uninstall: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+
+# Deploy controller in the configured Kubernetes cluster in ~/.kube/config
+deploy: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | kubectl apply -f -
+
+# Generate manifests e.g. CRD, RBAC etc.
+manifests: controller-gen
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	mv config/crd/bases/edgelevel.com_lastpasses.yaml chart/templates/crd.yaml
+
+# Run go fmt against code
+fmt:
+	go fmt ./...
+
+# Run go vet against code
+vet:
+	go vet ./...
+
+# Generate code
+generate: controller-gen
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+
+# Build the docker image
+docker-build: test
+	docker build . -t ${IMG}
+
+# Push the docker image
+docker-push:
+	docker push ${IMG}
+
+# find or download controller-gen
+# download controller-gen if necessary
+controller-gen:
+ifeq (, $(shell which controller-gen))
+	@{ \
+	set -e ;\
+	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
+	cd $$CONTROLLER_GEN_TMP_DIR ;\
+	go mod init tmp ;\
+	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0 ;\
+	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
+	}
+CONTROLLER_GEN=$(GOBIN)/controller-gen
+else
+CONTROLLER_GEN=$(shell which controller-gen)
+endif
+
+kustomize:
+ifeq (, $(shell which kustomize))
+	@{ \
+	set -e ;\
+	KUSTOMIZE_GEN_TMP_DIR=$$(mktemp -d) ;\
+	cd $$KUSTOMIZE_GEN_TMP_DIR ;\
+	go mod init tmp ;\
+	go get sigs.k8s.io/kustomize/kustomize/v3@v3.5.4 ;\
+	rm -rf $$KUSTOMIZE_GEN_TMP_DIR ;\
+	}
+KUSTOMIZE=$(GOBIN)/kustomize
+else
+KUSTOMIZE=$(shell which kustomize)
+endif
+
+# Generate bundle manifests and metadata, then validate generated files.
+bundle: manifests kustomize
+	operator-sdk generate kustomize manifests -q
+	kustomize build config/manifests | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	operator-sdk bundle validate ./bundle
+
+# Build the bundle image.
+bundle-build:
+	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
