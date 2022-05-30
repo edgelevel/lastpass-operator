@@ -78,7 +78,7 @@ func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// Request LastPass secrets
 	lastPassSecrets, err := lastpass.RequestSecrets(instance.Spec.SecretRef.Group, instance.Spec.SecretRef.Name)
 	// Logout
-	lastpass.Logout()
+	// lastpass.Logout()
 	if err != nil {
 		// Error parsing the response - requeue the request.
 		return reconcile.Result{}, err
