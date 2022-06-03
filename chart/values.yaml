@@ -1,5 +1,4 @@
 name: lastpass-operator
-namespace: lastpass
 
 image:
   repository: edgelevel/lastpass-operator
@@ -10,3 +9,5 @@ replicas: 1
 lastpass:
   username: ""
   password: ""
+
+secretNameTemplate: ""

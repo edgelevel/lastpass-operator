@@ -1,0 +1,17 @@
+domain: edgelevel.com
+layout: go.kubebuilder.io/v2
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+repo: github.com/edgelevel/lastpass-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: edgelevel.com
+  group: edgelevel.com
+  kind: LastPass
+  path: github.com/edgelevel/lastpass-operator/api/v1alpha1
+  version: v1alpha1
+version: "3"

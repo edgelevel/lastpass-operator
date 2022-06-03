@@ -36,11 +36,15 @@ func VerifyCliExistsOrDie() {
 
 // Login using lastpass-cli
 func Login(username string, password string) error {
-	// echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
-	out, err := sh.NewSession().SetEnv("LPASS_DISABLE_PINENTRY", "1").Command("echo", password).Command("lpass", "login", "--trust", username).Output()
-	if err != nil || "" == string(out) {
-		// sometimes returns error: "Error: HTTP response code said error" even if the credentials are valid
-		return fmt.Errorf("verify credentials, unable to login: %s", err)
+	_, err := sh.Command("lpass", "status").Output()
+	log.Printf("Checking if already logged in")
+	if err != nil {
+		log.Printf("Doing login")
+		out, err := sh.NewSession().SetEnv("LPASS_DISABLE_PINENTRY", "1").Command("echo", password).Command("lpass", "login", "--trust", username).Output()
+		if err != nil || "" == string(out) {
+			// sometimes returns error: "Error: HTTP response code said error" even if the credentials are valid
+			return fmt.Errorf("verify credentials, unable to login: %s", err)
+		}
 	}
 	log.Printf("Succesfully logged in")
 	return nil

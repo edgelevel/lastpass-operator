@@ -17,9 +17,11 @@ spec:
       containers:
         - name: {{ .Values.name }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
-          command:
-          - {{ .Values.name }}
           imagePullPolicy: Always
+          {{- if ne .Values.secretNameTemplate "" }}
+          args:
+            - --secret-name-template={{ .Values.secretNameTemplate }}
+          {{- end }}
           env:
             # default
             - name: WATCH_NAMESPACE
