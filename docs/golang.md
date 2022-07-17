@@ -1,43 +1,55 @@
 ## golang
 
 * [go](https://golang.org/doc) documentation
-* [dep](https://golang.github.io/dep/docs/introduction.html) Dependency management for Go
-* [Convert JSON into a Go type definition](https://mholt.github.io/json-to-go/)
+* [How To Build and Install Go Programs](https://www.digitalocean.com/community/tutorials/how-to-build-and-install-go-programs)
+* [Convert JSON into a Go type definition](https://mholt.github.io/json-to-go)
+
+```bash
+# verify env
+go env | grep GOPATH
+
+# setup workspace
+mkdir -p $HOME/go
+
+# add to .bashrc or .bash_profile
+export GOPATH=$HOME/go
+export PATH=$PATH:$(go env GOPATH)/bin
+```
 
 ```bash
 # download source
 mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
 git clone git@github.com:edgelevel/lastpass-operator.git
 
-# first time only
-dep init
+# resolve dependencies
+go mod tidy
 
 # add dependencies
-dep ensure -add github.com/USER/DEP1 github.com/USER/DEP2
+go get github.com/USER/DEP1 github.com/USER/DEP2
 # example
-dep ensure -add github.com/spf13/cobra
-dep ensure -add github.com/codeskyblue/go-sh
+go get github.com/spf13/cobra
+go get github.com/codeskyblue/go-sh
 
-# verify and update all dependencies
-dep status
-dep check
-dep ensure -update
+# verify dependencies
+go list -m all
 
-# resolve dependencies
-dep ensure
+# upgrade all dependencies to the latest or minor patch release
+go get -t -u ./...
 
 # init cli
 cobra init . --pkg-name lastpass-operator
+
+cd $GOPATH/src/github.com/edgelevel/lastpass-operator
 
 # run
 go run main.go
 
 # compile
-go build $GOPATH/src/github.com/edgelevel/lastpass-operator
+go build
 
 # compile and build executable
-go install $GOPATH/src/github.com/edgelevel/lastpass-operator
+go install
 
 # test
-go test $GOPATH/src/github.com/edgelevel/lastpass-operator
+go test ./...
 ```

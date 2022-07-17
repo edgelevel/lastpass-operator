@@ -1,6 +1,6 @@
 ## operator-sdk
 
-* [operator-sdk](https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md)
+* [operator-sdk](https://sdk.operatorframework.io/docs/building-operators/golang)
 * [Controller Runtime Client API](https://github.com/operator-framework/operator-sdk/blob/master/doc/user/client.md)
 * [A complete guide to Kubernetes Operator SDK](https://banzaicloud.com/blog/operator-sdk)
 * [OperatorHub](https://operatorhub.io)
@@ -9,18 +9,12 @@
 * [Level Triggering and Reconciliation in Kubernetes](https://hackernoon.com/level-triggering-and-reconciliation-in-kubernetes-1f17fe30333d)
 * [A deep dive into Kubernetes controllers](https://engineering.bitnami.com/articles/a-deep-dive-into-kubernetes-controllers.html)
 
-Setup go [workspace](https://golang.org/doc/code.html#Workspaces)
-```bash
-# add to .bashrc or .bash_profile
-export GOPATH=$HOME/go
-export PATH=$PATH:$(go env GOPATH)/bin
-```
-
 Initialize project
 ```bash
 # create project
 mkdir -p $GOPATH/src/github.com/edgelevel && cd $_
 operator-sdk new lastpass-operator --dep-manager=dep
+operator-sdk init --domain example.com --repo github.com/example/memcached-operator
 
 # add crd
 operator-sdk add api --api-version=edgelevel.com/v1alpha1 --kind=LastPass
