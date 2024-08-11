@@ -32,6 +32,7 @@ type LastPassReconciler struct {
 	SecretNameTemplate *template.Template
 }
 
+//+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses/status,verbs=get;update;patch
 
