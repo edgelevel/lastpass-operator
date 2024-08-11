@@ -3,6 +3,7 @@ name: lastpass-operator
 image:
   repository: edgelevel/lastpass-operator
   tag: latest
+  pullPolicy: Never
 
 replicas: 1
 

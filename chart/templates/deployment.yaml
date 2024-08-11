@@ -17,7 +17,7 @@ spec:
       containers:
         - name: {{ .Values.name }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
-          imagePullPolicy: Always
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if ne .Values.secretNameTemplate "" }}
           args:
             - --secret-name-template={{ .Values.secretNameTemplate }}
