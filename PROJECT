@@ -1,8 +1,10 @@
 domain: edgelevel.com
-layout: go.kubebuilder.io/v2
+layout:
+- go.kubebuilder.io/v4
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
+projectName: lastpass-operator
 repo: github.com/edgelevel/lastpass-operator
 resources:
 - api:

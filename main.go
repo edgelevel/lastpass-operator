@@ -13,6 +13,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	edgelevelcomv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
 	"github.com/edgelevel/lastpass-operator/controllers"
@@ -55,11 +56,12 @@ func main() {
 	printVersion()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		Port:               9443,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "e9330328.edgelevel.com",
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
+		LeaderElection:   enableLeaderElection,
+		LeaderElectionID: "e9330328.edgelevel.com",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
