@@ -16,7 +16,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	edgelevelcomv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
-	"github.com/edgelevel/lastpass-operator/controllers"
+	"github.com/edgelevel/lastpass-operator/internal/controller"
 	"github.com/edgelevel/lastpass-operator/version"
 	"github.com/rs/zerolog/log"
 	// +kubebuilder:scaffold:imports
@@ -73,7 +73,7 @@ func main() {
 		panic(err)
 	}
 
-	if err = (&controllers.LastPassReconciler{
+	if err = (&controller.LastPassReconciler{
 		Client:             mgr.GetClient(),
 		Log:                ctrl.Log.WithName("controllers").WithName("LastPass"),
 		Scheme:             mgr.GetScheme(),
