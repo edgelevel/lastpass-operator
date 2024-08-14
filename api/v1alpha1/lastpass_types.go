@@ -17,8 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"time"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -43,11 +41,6 @@ type SecretRef struct {
 	WithPassword bool   `json:"withPassword,omitempty"`
 	WithUrl      bool   `json:"withUrl,omitempty"`
 	WithNote     bool   `json:"withNote,omitempty"`
-}
-
-type SyncPolicy struct {
-	Enabled bool          `json:"enabled,required"`
-	Refresh time.Duration `json:"refresh,required"`
 }
 
 // LastPassStatus defines the observed state of LastPass
