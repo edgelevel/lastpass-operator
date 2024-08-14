@@ -10,14 +10,14 @@ COPY go.sum go.sum
 RUN go mod download -x
 
 # Copy the go source
-COPY main.go main.go
+COPY cmd/main.go cmd/main.go
 COPY api/ api/
-COPY controllers/ controllers/
+COPY internal/controller/ internal/controller/
 COPY pkg/ pkg/
 COPY version/ version/
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager cmd/main.go
 
 # Download lastpass-cli
 FROM ubuntu:22.04 as lastpass-cli
