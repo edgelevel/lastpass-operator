@@ -36,3 +36,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - edgelevel.com
+  resources:
+  - lastpassgroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - edgelevel.com
+  resources:
+  - lastpassgroups/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - edgelevel.com
+  resources:
+  - lastpassgroups/status
+  verbs:
+  - get
+  - patch
+  - update

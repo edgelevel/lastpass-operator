@@ -7,22 +7,23 @@ import (
 	"log"
 
 	"github.com/codeskyblue/go-sh"
+	"github.com/gocarina/gocsv"
 )
 
 // LastPassSecret represents a LastPass secret
 // For more examples see example/lpass-examples.txt
 // https://mholt.github.io/json-to-go/
 type LastPassSecret struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	Fullname        string `json:"fullname"`
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	LastModifiedGmt string `json:"last_modified_gmt"`
-	LastTouch       string `json:"last_touch"`
-	Group           string `json:"group"`
-	URL             string `json:"url"`
-	Note            string `json:"note"`
+	ID              string `json:"id" csv:"id"`
+	Name            string `json:"name" csv:"name"`
+	Fullname        string `json:"fullname" csv:"fullname"`
+	Username        string `json:"username" csv:"username"`
+	Password        string `json:"password" csv:"password"`
+	LastModifiedGmt string `json:"last_modified_gmt" csv:"last_modified_gmt"`
+	LastTouch       string `json:"last_touch" csv:"last_touch"`
+	Group           string `json:"group" csv:"group"`
+	URL             string `json:"url" csv:"url"`
+	Note            string `json:"note" csv:"extra"`
 }
 
 // VerifyCliExistsOrDie verifies that lastpass-cli is properly installed
@@ -86,6 +87,33 @@ func RequestSecrets(group string, name string) ([]LastPassSecret, error) {
 	log.Printf("Found [%d] secrets", len(secrets))
 
 	return secrets, nil
+}
+
+func RequestSecretsGroup(group string) ([]LastPassSecret, error) {
+	secrets := []LastPassSecret{}
+
+	log.Printf("Request Secrets Group: [%s]", group)
+
+	// Export is not dumping all the fields, so we must explicitly request the desired fields.
+	fields := "--fields=id,name,fullname,username,password,last_modified_gmt,last_touch,group,url,extra"
+
+	out, err := sh.Command("lpass", "export", fields).Output()
+	if err != nil {
+		return secrets, fmt.Errorf("invalid Secrets Group: [%s]", group)
+	}
+
+	if err := gocsv.UnmarshalBytes(out, &secrets); err != nil {
+		return secrets, fmt.Errorf("error unmarshaling secrets %s", err)
+	}
+
+	filteredSecrets := []LastPassSecret{}
+	for _, secret := range secrets {
+		if secret.Group == group {
+			filteredSecrets = append(filteredSecrets, secret)
+		}
+	}
+
+	return filteredSecrets, nil
 }
 
 // returns <GROUP>/<NAME> or <NAME>

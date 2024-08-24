@@ -1,17 +1,12 @@
 apiVersion: edgelevel.com/v1alpha1
-kind: LastPass
+kind: LastPassGroup
 metadata:
-  labels:
-    app.kubernetes.io/name: lastpass-operator
-    app.kubernetes.io/managed-by: kustomize
-  name: lastpass-sample
+  name: example-lastpassgroup
 spec:
   # required
   secretRef:
     # optional (default "")
-    group: SampleGroup
-    # required
-    name: Saample
+    group: example
     # optional (default false)
     withUsername: true
     # optional (default false)
@@ -25,4 +20,4 @@ spec:
     # required (default false)
     enabled: true
     # required (in seconds)
-    refresh: 60
+    refresh: 10
