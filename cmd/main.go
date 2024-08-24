@@ -82,6 +82,15 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "LastPass")
 		os.Exit(1)
 	}
+	if err = (&controller.LastPassGroupReconciler{
+		Client:             mgr.GetClient(),
+		Log:                ctrl.Log.WithName("controllers").WithName("LastPass"),
+		Scheme:             mgr.GetScheme(),
+		SecretNameTemplate: secretNameTemplate,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LastPassGroup")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")
