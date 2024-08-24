@@ -13,9 +13,10 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	edgelevelcomv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
-	"github.com/edgelevel/lastpass-operator/controllers"
+	"github.com/edgelevel/lastpass-operator/internal/controller"
 	"github.com/edgelevel/lastpass-operator/version"
 	"github.com/rs/zerolog/log"
 	// +kubebuilder:scaffold:imports
@@ -55,11 +56,12 @@ func main() {
 	printVersion()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		Port:               9443,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "e9330328.edgelevel.com",
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
+		LeaderElection:   enableLeaderElection,
+		LeaderElectionID: "e9330328.edgelevel.com",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -71,13 +73,22 @@ func main() {
 		panic(err)
 	}
 
-	if err = (&controllers.LastPassReconciler{
+	if err = (&controller.LastPassReconciler{
 		Client:             mgr.GetClient(),
 		Log:                ctrl.Log.WithName("controllers").WithName("LastPass"),
 		Scheme:             mgr.GetScheme(),
 		SecretNameTemplate: secretNameTemplate,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "LastPass")
+		os.Exit(1)
+	}
+	if err = (&controller.LastPassGroupReconciler{
+		Client:             mgr.GetClient(),
+		Log:                ctrl.Log.WithName("controllers").WithName("LastPass"),
+		Scheme:             mgr.GetScheme(),
+		SecretNameTemplate: secretNameTemplate,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LastPassGroup")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

@@ -1,16 +1,14 @@
-package controllers
+package controller
 
 import (
 	"bytes"
 	"context"
+	"slices"
 	"text/template"
 	"time"
 
-	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
-	"github.com/edgelevel/lastpass-operator/pkg/lastpass"
-	"github.com/edgelevel/lastpass-operator/pkg/utils"
-	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -20,35 +18,44 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	edgelevelv1alpha1 "github.com/edgelevel/lastpass-operator/api/v1alpha1"
+	"github.com/edgelevel/lastpass-operator/pkg/lastpass"
+	"github.com/edgelevel/lastpass-operator/pkg/utils"
+	"github.com/go-logr/logr"
 )
 
-var log = logf.Log.WithName("controller_lastpass")
+var (
+	secretOwnerKey = ".metadata.controller"
+	apiGVStr       = edgelevelv1alpha1.GroupVersion.String()
+)
 
-// LastPassReconciler reconciles a LastPass object
-type LastPassReconciler struct {
+// LastPassGroupReconciler reconciles a LastPassGroup object
+type LastPassGroupReconciler struct {
 	client.Client
 	Log                logr.Logger
 	Scheme             *runtime.Scheme
 	SecretNameTemplate *template.Template
 }
 
-//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpasses/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpassgroups,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpassgroups/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=edgelevel.com,resources=lastpassgroups/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the LastPass object against the actual cluster state, and then
+// the LastPassGroup object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.6.4/pkg/reconcile
-func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.3/pkg/reconcile
+func (r *LastPassGroupReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	var log = logf.Log.WithName("controller_lastpassgroup")
 	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling LastPass")
 
-	// Check that the environment variables are defined or exit. See also lastpass-master-secret
 	lastPassUsername := utils.GetEnvOrDie("LASTPASS_USERNAME")
 	lastPassPassword := utils.GetEnvOrDie("LASTPASS_PASSWORD")
 
@@ -61,8 +68,7 @@ func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return reconcile.Result{}, err
 	}
 
-	// Fetch the LastPass instance
-	instance := &edgelevelv1alpha1.LastPass{}
+	instance := &edgelevelv1alpha1.LastPassGroup{}
 	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -75,20 +81,37 @@ func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return reconcile.Result{}, err
 	}
 
-	// Request LastPass secrets
-	lastPassSecrets, err := lastpass.RequestSecrets(instance.Spec.SecretRef.Group, instance.Spec.SecretRef.Name)
-	// Logout
-	// lastpass.Logout()
+	lastPassSecrets, err := lastpass.RequestSecretsGroup(instance.Spec.GroupRef.Group)
 	if err != nil {
 		// Error parsing the response - requeue the request.
 		return reconcile.Result{}, err
 	}
 
-	for index := range lastPassSecrets {
+	desiredSecrets := r.newGroupSecretsForCR(instance, lastPassSecrets)
 
-		// Define a new Secret object
-		desired := r.newSecretForCR(instance, lastPassSecrets[index])
+	existingSecretslist := &corev1.SecretList{}
+	r.Client.List(context.TODO(), existingSecretslist, client.InNamespace(instance.Namespace), client.MatchingFields{
+		secretOwnerKey: req.Name,
+	})
 
+	deletedSecrets := []corev1.Secret{}
+	for _, sec := range existingSecretslist.Items {
+		contains := slices.ContainsFunc(desiredSecrets, func(s *corev1.Secret) bool { return s.Name == sec.Name })
+		if !contains {
+			deletedSecrets = append(deletedSecrets, sec)
+		}
+	}
+
+	for _, del := range deletedSecrets {
+		reqLogger.Info("Deleting Secret", "Secret.Namespace", del.Namespace, "Secret.Name", del.Name)
+
+		if err := r.Client.Delete(context.TODO(), &del); err != nil {
+			reqLogger.Error(err, "Failed to delete Secret", "Secret.Namespace", del.Namespace, "Secret.Name", del.Name)
+			return reconcile.Result{}, err
+		}
+	}
+
+	for _, desired := range desiredSecrets {
 		reqLogger.Info("Verify LastPassSecret", "Secret.Namespace", desired.Namespace, "Secret.Name", desired.Name)
 
 		// Set LastPassSecret instance as the owner and controller
@@ -135,63 +158,79 @@ func (r *LastPassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		reqLogger.Info("Skip reconcile: Secret already exists and is up to date", "Secret.Namespace", current.Namespace, "Secret.Name", current.Name)
 	}
 
-	// Periodically reconcile the Custom Resource
 	if instance.Spec.SyncPolicy.Enabled {
 		return reconcile.Result{RequeueAfter: time.Second * instance.Spec.SyncPolicy.Refresh}, nil
 	}
 
-	// Reconcile only if something happens inside the cluster: ignore if the Secret changes externally
 	return reconcile.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *LastPassReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *LastPassGroupReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &corev1.Secret{}, secretOwnerKey, func(rawObj client.Object) []string {
+		owner := metav1.GetControllerOf(rawObj.(*corev1.Secret))
+		if owner == nil || owner.APIVersion != apiGVStr || owner.Kind != "LastPassGroup" {
+			return nil
+		}
+
+		return []string{owner.Name}
+	}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&edgelevelv1alpha1.LastPass{}).
+		For(&edgelevelv1alpha1.LastPassGroup{}).
 		Complete(r)
 }
 
 // newSecretForCR creates a new secret
-func (r *LastPassReconciler) newSecretForCR(cr *edgelevelv1alpha1.LastPass, secret lastpass.LastPassSecret) *corev1.Secret {
+func (r *LastPassGroupReconciler) newGroupSecretsForCR(cr *edgelevelv1alpha1.LastPassGroup, secrets []lastpass.LastPassSecret) []*corev1.Secret {
 	labels := map[string]string{
 		"app": "lastpass-operator",
 	}
-	annotations := map[string]string{
-		"id":              secret.ID,
-		"group":           secret.Group,
-		"name":            secret.Name,
-		"fullname":        secret.Fullname,
-		"lastModifiedGmt": secret.LastModifiedGmt,
-		"lastTouch":       secret.LastTouch,
+
+	desiredSecrets := []*corev1.Secret{}
+	for _, secret := range secrets {
+		annotations := map[string]string{
+			"id":              secret.ID,
+			"group":           secret.Group,
+			"name":            secret.Name,
+			"fullname":        secret.Fullname,
+			"lastModifiedGmt": secret.LastModifiedGmt,
+			"lastTouch":       secret.LastTouch,
+		}
+
+		data := map[string]string{}
+		if cr.Spec.GroupRef.WithUsername {
+			data["USERNAME"] = secret.Username
+		}
+		if cr.Spec.GroupRef.WithPassword {
+			data["PASSWORD"] = secret.Password
+		}
+		if cr.Spec.GroupRef.WithUrl {
+			data["URL"] = secret.URL
+		}
+		if cr.Spec.GroupRef.WithNote {
+			data["NOTE"] = secret.Note
+		}
+
+		var secretName bytes.Buffer
+		r.SecretNameTemplate.Execute(&secretName, struct {
+			LastPass       *edgelevelv1alpha1.LastPassGroup
+			LastPassSecret lastpass.LastPassSecret
+		}{cr, secret})
+
+		desiredSecrets = append(desiredSecrets, &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        secretName.String(),
+				Namespace:   cr.Namespace,
+				Labels:      labels,
+				Annotations: annotations,
+			},
+			StringData: data,
+		})
 	}
 
-	data := map[string]string{}
-	if cr.Spec.SecretRef.WithUsername {
-		data["USERNAME"] = secret.Username
-	}
-	if cr.Spec.SecretRef.WithPassword {
-		data["PASSWORD"] = secret.Password
-	}
-	if cr.Spec.SecretRef.WithUrl {
-		data["URL"] = secret.URL
-	}
-	if cr.Spec.SecretRef.WithNote {
-		data["NOTE"] = secret.Note
-	}
-
-	var secretName bytes.Buffer
-	r.SecretNameTemplate.Execute(&secretName, struct {
-		LastPass       *edgelevelv1alpha1.LastPass
-		LastPassSecret lastpass.LastPassSecret
-	}{cr, secret})
-
-	return &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        secretName.String(),
-			Namespace:   cr.Namespace,
-			Labels:      labels,
-			Annotations: annotations,
-		},
-		StringData: data,
-	}
+	return desiredSecrets
 }

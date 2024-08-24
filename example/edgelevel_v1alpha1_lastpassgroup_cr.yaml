@@ -1,0 +1,23 @@
+apiVersion: edgelevel.com/v1alpha1
+kind: LastPassGroup
+metadata:
+  name: example-lastpassgroup
+spec:
+  # required
+  secretRef:
+    # optional (default "")
+    group: example
+    # optional (default false)
+    withUsername: true
+    # optional (default false)
+    withPassword: true
+    # optional (default false)
+    withUrl: true
+    # optional (default false)
+    withNote: true
+  # optional
+  syncPolicy:
+    # required (default false)
+    enabled: true
+    # required (in seconds)
+    refresh: 10

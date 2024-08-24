@@ -1,0 +1,6 @@
+## Append samples of your project ##
+resources:
+- v1alpha1_lastpass.yaml
+- v1alpha1_lastpassgroup.yaml
+# - _v1alpha1_lastpassgroup.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
