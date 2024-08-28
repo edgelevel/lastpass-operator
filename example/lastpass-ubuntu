@@ -1,19 +1,36 @@
-FROM phusion/baseimage:latest
+FROM ubuntu:22.04 AS builder
 
-RUN apt-get update && apt-get upgrade -y
+ENV LASTPASS_VERSION=1.5.0
 
-RUN apt-get update && apt-get --no-install-recommends install -y \
-  bash-completion \
-  build-essential \
-  cmake \
-  libcurl3  \
-  libcurl3-openssl-dev  \
-  libssl1.0.0 \
-  libssl-dev \
-  libxml2 \
-  libxml2-dev  \
-  pkg-config \
-  ca-certificates \
-  xclip \
-  lastpass-cli && \
-  apt-get clean
+# https://github.com/lastpass/lastpass-cli?tab=readme-ov-file#building
+RUN apt update && apt --no-install-recommends -yqq install \
+    bash-completion \
+    build-essential \
+    cmake \
+    libcurl4  \
+    libcurl4-openssl-dev  \
+    libssl-dev  \
+    libxml2 \
+    libxml2-dev  \
+    libssl3 \
+    pkg-config \
+    ca-certificates \
+    xclip \
+    wget
+
+RUN wget -O lastpass-cli.tar.gz https://github.com/lastpass/lastpass-cli/releases/download/v${LASTPASS_VERSION}/lastpass-cli-${LASTPASS_VERSION}.tar.gz; \
+    tar -xf lastpass-cli.tar.gz
+
+WORKDIR /lastpass-cli-${LASTPASS_VERSION}
+
+RUN make && make install
+
+RUN mkdir -p /usr/lib/lastpass-cli \
+&& ldd /usr/bin/lpass | grep '=>' | awk '{ print $3 }' | xargs cp -t /usr/lib/lastpass-cli
+
+FROM ubuntu:22.04
+
+RUN apt update && apt --no-install-recommends -yqq install ca-certificates
+
+COPY --from=builder /usr/bin/lpass /usr/bin/which /usr/bin/
+COPY --from=builder /usr/lib/lastpass-cli /lib

@@ -1,5 +1,35 @@
-FROM alpine:latest
+FROM alpine:latest AS builder
+
+ENV LASTPASS_VERSION=1.5.0
 
 RUN apk add --update --no-cache \
-  lastpass-cli && \
-  rm -f /var/cache/apk/*
+    bash-completion \
+    cmake \
+    curl-dev \
+    openssl-dev \
+    libxml2 \
+    libxml2-dev \
+    libssl3 \
+    pkgconf \
+    ca-certificates \
+    xclip \
+    g++ \
+    make \
+    wget
+
+RUN wget -O lastpass-cli.tar.gz https://github.com/lastpass/lastpass-cli/releases/download/v${LASTPASS_VERSION}/lastpass-cli-${LASTPASS_VERSION}.tar.gz; \
+    tar -xf lastpass-cli.tar.gz
+
+WORKDIR /lastpass-cli-${LASTPASS_VERSION}
+
+RUN make && make install
+
+RUN mkdir -p /usr/lib/lastpass-cli \
+    && ldd /usr/bin/lpass | grep '=>' | awk '{ print $3 }' | xargs cp -t /usr/lib/lastpass-cli
+
+
+
+FROM alpine:latest 
+
+COPY --from=builder /usr/bin/lpass /usr/bin/which /usr/bin/
+COPY --from=builder /usr/lib/lastpass-cli /lib
