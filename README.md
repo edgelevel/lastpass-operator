@@ -4,8 +4,8 @@
 [![Docker Tag][tag-image]][tag-url]
 [![Docker Pulls][pulls-image]][pulls-url]
 
-[build-image]: https://img.shields.io/travis/edgelevel/lastpass-operator.svg?style=popout-square
-[build-url]: https://travis-ci.org/edgelevel/lastpass-operator
+[build-image]: https://github.com/edgelevel/lastpass-operator/actions/workflows/ci.yml/badge.svg
+[build-url]: https://github.com/edgelevel/lastpass-operator/actions/workflows/ci.yml
 [tag-image]: https://img.shields.io/github/tag/edgelevel/lastpass-operator.svg?style=popout-square&color=blue
 [tag-url]: https://hub.docker.com/r/edgelevel/lastpass-operator
 [pulls-image]: https://img.shields.io/docker/pulls/edgelevel/lastpass-operator?color=orange&style=flat-square
