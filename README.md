@@ -34,7 +34,7 @@ $ lpass show example/my-secret --json
 ]
 ```
 
-Define a `LastPass` [Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources) to automatically manage the lifecycle of your secrets in Kubernetes
+Define a `LastPass` or `LastPassGroup` [Custom Resource](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources) to automatically manage the lifecycle of your secrets in Kubernetes
 ```bash
 $ cat example/edgelevel_v1alpha1_lastpass_cr.yaml
 apiVersion: edgelevel.com/v1alpha1
@@ -55,6 +55,27 @@ spec:
 
 # create a custom resource
 $ kubectl apply -f example/edgelevel_v1alpha1_lastpass_cr.yaml
+```
+_NOTE: The `LastPassGroup` custom resource will sync all the secrets in a lastpass folder to kubernetes. The lastpass group will **not** sync subfolders._
+```bash
+$ cat example/edgelevel_v1alpha1_lastpassgroup_cr.yaml
+apiVersion: edgelevel.com/v1alpha1
+kind: LastPassGroup
+metadata:
+  name: example-lastpassgruop
+spec:
+  secretRef:
+    group: example
+    withUsername: true
+    withPassword: true
+    withUrl: true
+    withNote: true
+  syncPolicy:
+    enabled: true
+    refresh: 10
+
+# create a custom resource
+$ kubectl apply -f example/edgelevel_v1alpha1_lastpassgroup_cr.yaml
 ```
 
 The operator will take care of create native Kubernetes secrets and keep them up to date that if they change
@@ -153,14 +174,20 @@ Run locally outside the cluster on [minkube](https://github.com/kubernetes/minik
 # requires virtualbox
 minikube start
 
-# apply crd
-kubectl apply -f chart/templates/crd.yaml
-
 # run locally
 export OPERATOR_NAME=lastpass-operator
 export LASTPASS_USERNAME=myUsername
 export LASTPASS_PASSWORD=myPassword
-operator-sdk up local --namespace=default --verbose
+
+# Install CRDs into cluster
+make install
+
+# Start lastpass operator
+make run
+
+# Alternatively you can install and run with
+make install run
+
 ```
 
 Run as a Deployment inside the cluster
