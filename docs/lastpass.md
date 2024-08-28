@@ -19,7 +19,7 @@ lpass show <GROUP>/<NAME> --json --expand-multi
 lpass logout --force
 ```
 
-Docker Alpine (8.07MB)
+Docker Alpine (20.1MB)
 ```bash
 # temporary base container
 docker run --rm -it alpine /bin/sh
@@ -33,7 +33,7 @@ echo <PASSWORD> | LPASS_DISABLE_PINENTRY=1 lpass login --trust <USERNAME>
 echo <PASSWORD> | lpass show <GROUP>/<NAME> --json --expand-multi
 ```
 
-Docker Ubuntu (673MB)
+Docker Ubuntu (192MB)
 ```bash
 # build image
 docker build -t edgelevel/lastpass-cli -f example/lastpass-ubuntu .
